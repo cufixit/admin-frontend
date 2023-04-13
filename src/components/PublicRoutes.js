@@ -2,16 +2,16 @@ import React, { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
 
-const PrivateRoutes = () => {
+const PublicRoutes = () => {
   const location = useLocation();
 
   const { session } = useContext(AccountContext);
 
-  return session ? (
+  return !session ? (
     <Outlet />
   ) : (
-    <Navigate to="/login" replace state={{ from: location }} />
+    <Navigate to="/home" replace state={{ from: location }} />
   );
 };
 
-export default PrivateRoutes;
+export default PublicRoutes;

@@ -8,8 +8,7 @@ import UserPool from "../UserPool";
 const Signup = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const [name, setName] = useState("");
     const [uni, setUni] = useState("");
     const [code, setCode] = useState("");
     const [success, setSuccess] = useState("");
@@ -19,10 +18,7 @@ const Signup = () => {
 
         let attributeList = [
             new CognitoUserAttribute({
-                Name: "custom:first_name", Value: firstName.trim()
-            }),
-            new CognitoUserAttribute({
-                Name: "custom:last_name", Value: lastName.trim()
+                Name: "custom:full_name", Value: name.trim()
             }),
             new CognitoUserAttribute({
                 Name: "custom:uni", Value: uni.trim()
@@ -70,21 +66,13 @@ const Signup = () => {
         <Container>
             <div>Register</div>
             <Form onSubmit={onSubmit}>
-                <Form.Group className="mb-3" controlId="formFirstName">
-                    <Form.Label>First Name</Form.Label>
+                <Form.Group className="mb-3" controlId="formName">
+                    <Form.Label>Full Name</Form.Label>
                     <Form.Control 
-                        value={firstName} 
-                        onChange={(event) => setFirstName(event.target.value)} 
+                        value={name} 
+                        onChange={(event) => setName(event.target.value)} 
                         type="name" 
-                        placeholder="Enter first name" />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formLastName">
-                    <Form.Label>Last Name</Form.Label>
-                    <Form.Control 
-                        value={lastName} 
-                        onChange={(event) => setLastName(event.target.value)} 
-                        type="name" 
-                        placeholder="Enter last name" />
+                        placeholder="Enter full name" />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formUni">
                     <Form.Label>Uni</Form.Label>

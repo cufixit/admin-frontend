@@ -3,32 +3,35 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
-import { Account } from "./components/Account";
+import { AccountProvider } from "./components/AccountContext";
 import Status from "./components/Status";
-import Home from "./components/Home";
-import PrivateRoutes from "./components/PrivateRoutes";
 import Start from "./components/Start";
 import Groups from "./components/Groups";
 import Reports from "./components/Reports";
+import Home from "./components/Home";
+import PrivateRoutes from "./components/PrivateRoutes";
+import PublicRoutes from "./components/PublicRoutes";
 
 const App = () => {
   return (
-    <Account>
-      <Status />
-      <BrowserRouter>
+    <BrowserRouter>
+      <AccountProvider>
+        <Status />
         <Routes>
-          <Route element={<PrivateRoutes/>}>
-            <Route path="/home" element={<Home />}/>
-            <Route path="/groups" element={<Groups />}/>
-            <Route path="/reports" element={<Reports />}/>
-          </Route> 
-          <Route path="/" element={<Start />}/>
-          <Route path="/signup" element={<Signup />}/>
-          <Route path="/login" element={<Login />}/>
+          <Route element={<PrivateRoutes />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/groups" element={<Groups />} />
+          </Route>
+          <Route element={<PublicRoutes />}>
+            <Route path="/" element={<Start />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+          </Route>
         </Routes>
-      </BrowserRouter>
-    </Account>
+      </AccountProvider>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
