@@ -22,8 +22,7 @@ const App = () => {
           <Route element={<PrivateRoutes />}>
             <Route path="/home" element={<Home />} />
             <Route path="/reports" element={<Reports />} />
-            <Route exact path="/report/:id" element={<Report />} />
-            {/* <Route exact path="/reports/:id" component={Reports} /> */}
+            <Route exact path="/reports/:id" element={<Report />} />
             <Route path="/groups" element={<Groups />} />
           </Route>
           <Route element={<PublicRoutes />}>

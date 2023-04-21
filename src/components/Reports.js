@@ -41,14 +41,7 @@ const Reports = () => {
       headerName: "Details",
       sortable: false,
       renderCell: (cellValues) => {
-        return (
-          <Link
-            to={"/report/" + cellValues.id}
-            state={{ data: cellValues.row }}
-          >
-            Details
-          </Link>
-        );
+        return <Link to={`/reports/${cellValues.id}`}>Details</Link>;
       },
     },
     { field: "date" },
