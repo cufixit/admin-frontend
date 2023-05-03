@@ -5,6 +5,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { AccountContext } from "./AccountContext";
+import { useLocation } from "react-router-dom";
 // import AWS from 'aws-sdk';
 // import apigClientFactory from '../sdk/apigClient';
 
@@ -12,46 +13,36 @@ const New = () => {
   // var sdk = apigClientFactory.newClient();
   const { session } = useContext(AccountContext);
 
-  const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
+  const data = useLocation().state.data;
 
-  const [files, setFiles] = useState();
-  const [uploadSuccess, setUploadSuccess] = useState("");
+  const [title, setTitle] = useState(data.title);
+  const [location, setLocation] = useState(data.location);
+  const [description, setDescription] = useState(data.description);
+  const [status, setStatus] = useState(data.status);
 
   const onSubmit = (event) => {
     event.preventDefault();
-    console.log(files);
-    var fileLength = 0;
-    if (files) {
-      setUploadSuccess("You have uploaded file(s).");
-      fileLength = files.length;
-    } else {
-      setUploadSuccess("No file has been uploaded.");
-    }
 
     const submission = {
       title: title.trim(),
       location: location,
       description: description.trim(),
-      numImages: fileLength,
+      status: status,
     };
     console.log(submission);
-
-    // sdk.reportPost();
   };
 
   return (
     <Container>
-      <h1>New Report</h1>
+      <h1>New Group</h1>
       <Form onSubmit={onSubmit}>
         <Row className="mb-3">
-          <Form.Group as={Col} controlId="issueTitle">
-            <Form.Label>Issue Title</Form.Label>
+          <Form.Group as={Col} controlId="groupTitle">
+            <Form.Label>Group Title</Form.Label>
             <Form.Control
               type="title"
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="Enter issue title"
+              defaultValue={data.title}
               required
             />
           </Form.Group>
@@ -59,12 +50,13 @@ const New = () => {
           <Form.Group as={Col} controlId="location">
             <Form.Label>Location</Form.Label>
             <Form.Select
-              defaultValue="Wien Hall"
+              defaultValue={data.location}
               onChange={(event) => setLocation(event.target.value)}
             >
               <option>Wien Hall</option>
               <option>Broadway Hall</option>
               <option>Mudd</option>
+              <option>East Campus</option>
             </Form.Select>
           </Form.Group>
         </Row>
@@ -76,26 +68,25 @@ const New = () => {
               onChange={(event) => setDescription(event.target.value)}
               as="textarea"
               rows={3}
-              placeholder="Give a detailed description of what the issue is."
+              defaultValue={data.description}
             />
           </Form.Group>
         </Row>
-
         <Row className="mb-3">
-          <Form.Group as={Col} controlId="imgs">
-            <Form.Label>Upload images</Form.Label>
-            <br />
-            <input
-              onChange={(event) => setFiles(event.target.files)}
-              type="file"
-              name="file"
-              multiple
-            />
+          <Form.Group as={Col} controlId="status">
+            <Form.Label>Status</Form.Label>
+            <Form.Select
+              defaultValue="In progress"
+              onChange={(event) => setLocation(event.target.value)}
+            >
+              <option>In progress</option>
+              <option>Completed</option>
+              <option>Submitted</option>
+            </Form.Select>
           </Form.Group>
         </Row>
-        <div>{uploadSuccess}</div>
         <Button variant="primary" type="submit">
-          Submit
+          Create Group
         </Button>
       </Form>
     </Container>
