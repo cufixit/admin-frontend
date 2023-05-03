@@ -5,13 +5,14 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { AccountContext } from "./AccountContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 // import AWS from 'aws-sdk';
 // import apigClientFactory from '../sdk/apigClient';
 
 const New = () => {
   // var sdk = apigClientFactory.newClient();
   const { session } = useContext(AccountContext);
+  const navigate = useNavigate();
 
   const data = useLocation().state.data;
 
@@ -24,12 +25,20 @@ const New = () => {
     event.preventDefault();
 
     const submission = {
+      id: 1,
       title: title.trim(),
       location: location,
       description: description.trim(),
       status: status,
     };
     console.log(submission);
+    navigate("/groups/1", {state: { data: submission, report: data }});
+    <Link 
+      to={{
+        pathname: "/groups/1",
+        state: { data: submission },
+      }} 
+     />
   };
 
   return (

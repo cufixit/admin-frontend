@@ -3,41 +3,48 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
 import { useLocation } from "react-router-dom";
+import Grid from '@mui/material/Grid';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import apigClient from "../ApigClient";
+import Paper from '@mui/material/Paper';
 
 const Group = () => {
     let location = useLocation();
+    console.log(location);
     const data = location.state.data;
+    const report = location.state.report;
+
+    const Item = styled(Paper)(({ theme }) => ({
+        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+        ...theme.typography.body2,
+        padding: theme.spacing(1),
+        color: theme.palette.text.secondary,
+    }));
+      
 
     return (
         <Container>
-            <h1>Create Group</h1>
-            <Box
-            component="form"
-            sx={{
-                '& .MuiTextField-root': { m: 1, width: '25ch' },
-            }}
-            noValidate
-            autoComplete="off"
-            >
-            <div>
-                <TextField
-                required
-                id="outlined-required"
-                label="Required"
-                defaultValue="Hello World"
-                />
-                <TextField id="outlined-search" label="Search field" type="search" />
-                <TextField
-                id="outlined-helperText"
-                label="Helper text"
-                defaultValue="Default Value"
-                helperText="Some important text"
-                />
-            </div>
-            </Box>
+            <Grid container spacing={2}>
+                <Grid item xs={8}>
+                    <Item>
+                        <Container>
+                            <h2>Group #{data.id}: {data.title}</h2>
+                            <h3>Details</h3>
+                            <div>Description: {data.description}</div>
+                            <div>Location: {data.location}</div>
+                            <div>Status: {data.status} </div>
+                        </Container>
+                        <br/>
+                        <Container>
+                            <h3>Reports</h3>
+                            
+                        </Container>
+                    </Item>
+                </Grid>
+                <Grid item xs={4}>
+                    <Item>xs=4</Item>
+                </Grid>
+            </Grid>
         </Container>
       );
 }
