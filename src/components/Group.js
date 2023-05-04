@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import Link from '@mui/material/Link';
 
 const Group = () => {
     let location = useLocation();
@@ -37,12 +38,16 @@ const Group = () => {
                         <br/>
                         <Container>
                             <h3>Reports</h3>
-                            
+                            <Link href={`/reports/${report.id}`}>{report.title}</Link>
                         </Container>
                     </Item>
                 </Grid>
                 <Grid item xs={4}>
-                    <Item>xs=4</Item>
+                    <Item>
+                        <Container>
+                            <h4>Suggested</h4>
+                        </Container>
+                    </Item>
                 </Grid>
             </Grid>
         </Container>
