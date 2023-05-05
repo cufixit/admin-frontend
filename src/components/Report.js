@@ -44,7 +44,7 @@ const Report = () => {
     try {
       // const response = await apigClient.invokeApi(
       //   {},
-      //   "/groups",
+      //   "/admin/groups",
       //   "POST",
       //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
       //   report

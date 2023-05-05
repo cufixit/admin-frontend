@@ -3,11 +3,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
 import { useLocation } from "react-router-dom";
-import { styled } from '@mui/material/styles';
-// import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
-// import { Box, Grid, IconButton, Typography, List, ListItem } from '@material-ui/core';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import CheckIcon from '@mui/icons-material/Check';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import apigClient from "../ApigClient";
@@ -15,13 +12,12 @@ import {
     Box,
     Button,
     Container,
-    Divider, FormControl,
+    Divider,
     Grid,
     IconButton,
-    InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
+    List, ListItem, ListItemText,
     Modal,
     Paper, Stack,
-    TextField,
     Typography
 } from "@mui/material";
 
@@ -30,8 +26,12 @@ const Group = () => {
     const data = location.state.data;
     const report = location.state.report;
     const [reports, setReports] = useState([report]);
-    const [modalContent, setModalContent] = useState({});
     const [suggested, setSuggested] = useState(null);
+    const [added, setAdded] = useState([]);
+    const [confirmedIds, setConfirmedIds] = useState([]);
+
+    // Modal for viewing a report
+    const [modalContent, setModalContent] = useState({});
     const [open, setOpen] = useState(false);
     const handleOpen = async (event, item) => {
         event.preventDefault();
@@ -59,28 +59,45 @@ const Group = () => {
     ];
     rows.map((row) => row["id"] = row["reportID"]);
 
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        color: theme.palette.text.secondary,
-    }));
-
     // Adds a suggested report to the group
-    const addToGroup = async (event, item) => {
+    const addSuggested = async (event, item) => {
+        event.preventDefault();
+        try {
+            if (added.find(elem => elem.id === item.id) === undefined && reports.find(elem => elem.id === item.id) === undefined) {
+                setAdded([...added, item]);
+                setConfirmedIds([...confirmedIds, item.id]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // Removes suggested report from the group
+    const removeSuggested = async (event, item) => {
+        event.preventDefault();
+        try {
+            setAdded(added.filter(elem => elem.id !== item.id));
+            setConfirmedIds(confirmedIds.filter(elem => elem !== item.id));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // Confirms and posts the request to add the suggested reports to the group
+    const confirmAdd = async (event) => {
         event.preventDefault();
         try {
             // const response = await apigClient.invokeApi(
             //   {},
-            //   "/groups",
+            //   `/admin/groups/${params.id}/reports`,
             //   "POST",
             //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
-            //   item
+            //   confirmedIds
             // )
             // console.log(response);
-            if (reports.find(elem => elem.id === item.id) === undefined) {
-                setReports([...reports, item]);
-            }
+            setReports([...reports, ...added]);
+            setAdded([]);
+            setConfirmedIds([]);
         } catch (error) {
             console.log(error);
         }
@@ -91,7 +108,7 @@ const Group = () => {
         try {
             // const response = await apigClient.invokeApi(
             //   {},
-            //   `/groups/${params.id}`,
+            //   `admin/groups/${params.id}`,
             //   "GET",
             //   {
             //     headers: { Authorization: session["idToken"]["jwtToken"] },
@@ -110,7 +127,7 @@ const Group = () => {
         try {
             // const response = await apigClient.invokeApi(
             //     {},
-            //     "/suggested",
+            //     `/admin/groups/suggested`,
             //     "GET",
             //     { headers: { Authorization: session["idToken"]["jwtToken"] } },
             // );
@@ -132,7 +149,6 @@ const Group = () => {
                 <Grid item xs={12} md={6} lg={7}>
                     {
                         <Paper sx={{padding: "20px 30px 30px"}}>
-                            {/* <Typography variant="h5" marginBottom="10px">{`Add Items to ${order.initiator.firstName}'s ${order.platform.name} Order`}</Typography> */}
                             <Typography variant="h5" marginBottom="10px">{`Group ${data.id}: ${data.title}`}</Typography>
                             <Divider sx={{marginBottom: "25px"}} />
                             <Stack spacing={2}>
@@ -143,12 +159,8 @@ const Group = () => {
                         </Paper>
                     }
                     {
-                        <Paper sx={{padding: "20px 30px 30px"}}>
+                        <Paper sx={{padding: "20px 30px 30px", marginBottom: "20px"}}>
                             <Typography variant="h5" marginBottom="15px">Reports</Typography>
-                            {/* <Typography fontSize="18px" marginBottom="5px">Hooray! You've submitted your items to the group order.</Typography>
-                            <Typography fontSize="18px" marginBottom="20px">Once the initiator accepts your items, we'll let you know, and the order will show up on your "Joined Orders" page.</Typography>
-                            <Button variant="contained" color="primary" sx={{fontWeight: "600", marginRight: "15px"}} component={Link} to={"/reports"}>Back to reports</Button>
-                            <Button variant="outlined" color="primary" sx={{fontWeight: "600"}} component={Link} to={"/groups"}>Back to groups</Button> */}
                             <List>
                                  {reports.map(item => (
                                     <ListItem key={item.id}>
@@ -164,6 +176,28 @@ const Group = () => {
                             </List>
                         </Paper>
                     }
+                    {
+                        added.length == 0 ? <></> : 
+                        <Paper sx={{padding: "20px 30px 30px"}}>
+                            <Typography variant="h5" marginBottom="15px">Added Reports</Typography>
+                            <List>
+                                 {added.map(item => (
+                                    <ListItem key={item.id}>
+                                        <ListItemText primary={`Report ${item.id}: ${item.title}`} />
+                                        <IconButton onClick={(event) => handleOpen(event, item)}>
+                                            <InfoOutlinedIcon/>
+                                        </IconButton>
+                                        <IconButton onClick={(event) => removeSuggested(event, item)}>
+                                            <DeleteOutlineOutlinedIcon sx={{ color: "red" }}/>
+                                        </IconButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                            <Button variant="contained" color="success" fullWidth sx={{marginTop: "10px", fontWeight: "800"}} onClick={confirmAdd}>
+                                <CheckIcon sx={{marginRight: "5px"}} /> Add Suggested Reports
+                            </Button>
+                        </Paper>
+                    }
                 </Grid>
                 <Grid item xs={12} md={6} lg={5}>
                     <Paper sx={{padding: "20px 30px 30px"}}>
@@ -177,7 +211,7 @@ const Group = () => {
                                                 key={i}
                                                 disablePadding
                                             >
-                                                <IconButton onClick={(event) => addToGroup(event, item)}>
+                                                <IconButton onClick={(event) => addSuggested(event, item)}>
                                                     <ArrowBackIosIcon/>
                                                 </IconButton>
                                                 <ListItemText
