@@ -19,19 +19,38 @@ import {
     Grid,
     IconButton,
     InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
+    Modal,
     Paper, Stack,
     TextField,
     Typography
 } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import CheckIcon from '@mui/icons-material/Check';
 
 const Group = () => {
     let location = useLocation();
     const data = location.state.data;
     const report = location.state.report;
     const [reports, setReports] = useState([report]);
+    const [modalContent, setModalContent] = useState({});
     const [suggested, setSuggested] = useState(null);
+    const [open, setOpen] = useState(false);
+    const handleOpen = async (event, item) => {
+        event.preventDefault();
+        setOpen(true);
+        setModalContent(item);
+    }
+    const handleClose = () => setOpen(false);
+
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 500,
+        bgcolor: 'background.paper',
+        border: '1px solid #000',
+        boxShadow: 24,
+        p: 5,
+    };
 
     let rows = [
         { reportID: 1, title: 'Clogged sink in 2016 kitchen', description: "The sink is clogged and has been clogged since last Sunday.", location: 'East Campus', status: 'Submitted', date: "1/20/2023 2:58 PM EST" },
@@ -121,10 +140,6 @@ const Group = () => {
                                 <Typography variant="body1">Location: {data.location}</Typography>
                                 <Typography variant="body1">Status: {data.status}</Typography>
                             </Stack>
-                            {/* <Button type="submit" variant="contained" fullWidth
-                                    sx={{marginTop: "30px", fontWeight: "800"}}>
-                                <AddIcon sx={{marginRight: "5px"}}/> Add
-                            </Button> */}
                         </Paper>
                     }
                     {
@@ -138,10 +153,10 @@ const Group = () => {
                                  {reports.map(item => (
                                     <ListItem key={item.id}>
                                         <ListItemText primary={`Report ${item.id}: ${item.title}`} />
-                                        <IconButton onClick={(event) => addToGroup(event, item)}>
+                                        <IconButton onClick={(event) => handleOpen(event, item)}>
                                             <InfoOutlinedIcon/>
                                         </IconButton>
-                                        <IconButton onClick={(event) => addToGroup(event, item)}>
+                                        <IconButton>
                                             <DeleteOutlineOutlinedIcon sx={{ color: "red" }}/>
                                         </IconButton>
                                     </ListItem>
@@ -162,29 +177,24 @@ const Group = () => {
                                                 key={i}
                                                 disablePadding
                                             >
-                                                <ListItemButton dense>
-                                                    <ListItemIcon>
-                                                        <ArrowBackIosIcon sx={{color: "success.main"}} />
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                        primary={
-                                                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                                                <Typography fontWeight="500" sx={{
-                                                                    overflow: "hidden",
-                                                                    textOverflow: "ellipsis",
-                                                                    display: "-webkit-box",
-                                                                    WebkitLineClamp: "2",
-                                                                    WebkitBoxOrient: "vertical",
-                                                                }}>
-                                                                    {item.name}
-                                                                </Typography>
-                                                                <Typography marginLeft="30px" fontSize="1.3em" fontWeight="500">
-                                                                    {`Report ${item.id}: ${item.title}`}
-                                                                </Typography>
-                                                            </Stack>
-                                                        }
-                                                    />
-                                                </ListItemButton>
+                                                <IconButton onClick={(event) => addToGroup(event, item)}>
+                                                    <ArrowBackIosIcon/>
+                                                </IconButton>
+                                                <ListItemText
+                                                    primary={
+                                                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                                            <Typography fontWeight="500" onClick={(event) => handleOpen(event, item)} sx={{
+                                                                overflow: "hidden",
+                                                                textOverflow: "ellipsis",
+                                                                display: "-webkit-box",
+                                                                WebkitLineClamp: "2",
+                                                                WebkitBoxOrient: "vertical",
+                                                            }}>
+                                                                {`Report ${item.id}: ${item.title}`}
+                                                            </Typography>
+                                                        </Stack>
+                                                    }
+                                                />
                                             </ListItem>
                                     ))}
                                 </List>
@@ -193,63 +203,31 @@ const Group = () => {
                     </Paper>
                 </Grid>
             </Grid>
+            <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                    {`Report ${modalContent.id}: ${modalContent.title}`}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 3 }}>
+                    {`Description: ${modalContent.description}`}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    {`Location: ${modalContent.location}`}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    {`Status: ${modalContent.status}`}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    {`Date Submitted: ${modalContent.date}`}
+                    </Typography>
+                </Box>
+            </Modal>
         </Container>
-        // <Container>
-        //     <Grid container spacing={2}>
-        //         <Grid item xs={8}>
-        //             <Item>
-        //                 <Container>
-        //                     <Typography variant="h5">{data.title} <span sx={{fontWeight: "bold"}}>({data.id})</span></Typography>
-        //                     <Stack direction="column" spacing={2}>
-        //                         <Typography variant="body1">Description: {data.description}</Typography>
-        //                         <Typography variant="body1">Location: {data.location}</Typography>
-        //                         <Typography variant="body1">Status: {data.status}</Typography>
-        //                     </Stack>
-        //                 </Container>
-        //                     <List>
-        //                         {reports.map(item => (
-        //                             <ListItem key={item.id}>
-        //                                 <ListItemText primary={`Report ${item.id}: ${item.title}`} />
-        //                                 <IconButton onClick={(event) => addToGroup(event, item)}>
-        //                                     <InfoOutlinedIcon/>
-        //                                 </IconButton>
-        //                                 <IconButton onClick={(event) => addToGroup(event, item)}>
-        //                                     <DeleteOutlineOutlinedIcon/>
-        //                                 </IconButton>
-        //                             </ListItem>
-        //                         ))}
-        //                     </List>
-        //                     {/* <Link href={`/reports/${report.id}`}>{report.title}</Link>
-        //                      */}
-        //             </Item>
-        //         </Grid>
-        //         <Grid item xs={4}>
-        //             <Item>
-        //                 <Container>
-        //                     <h4>Suggested</h4>
-        //                     <List>
-        //                         {rows.map(item => (
-        //                             <ListItem key={item.id}>
-        //                                 <IconButton onClick={(event) => addToGroup(event, item)}>
-        //                                     <ArrowBackIosIcon/>
-        //                                 </IconButton>
-        //                                 <Box 
-        //                                     padding={1}
-        //                                     display="flex"
-        //                                     flexDirection="column"
-        //                                     alignItems="center"
-        //                                     justifyContent="center"
-        //                                 >
-        //                                     <Typography variant="subtitle1">Report {item.id}: {item.title}</Typography>
-        //                                 </Box>
-        //                             </ListItem>
-        //                         ))}
-        //                     </List>
-        //                 </Container>
-        //             </Item>
-        //         </Grid>
-        //     </Grid>
-        // </Container>
       );
 }
 
