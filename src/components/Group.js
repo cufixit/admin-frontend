@@ -156,24 +156,21 @@ const Group = () => {
                                 <Typography variant="body1">Location: {data.location}</Typography>
                                 <Typography variant="body1">Status: {data.status}</Typography>
                             </Stack>
-                        </Paper>
-                    }
-                    {
-                        <Paper sx={{padding: "20px 30px 30px", marginBottom: "20px"}}>
-                            <Typography variant="h5" marginBottom="15px">Reports</Typography>
-                            <List>
-                                 {reports.map(item => (
-                                    <ListItem key={item.id}>
-                                        <ListItemText primary={`Report ${item.id}: ${item.title}`} />
-                                        <IconButton onClick={(event) => handleOpen(event, item)}>
-                                            <InfoOutlinedIcon/>
-                                        </IconButton>
-                                        <IconButton>
-                                            <DeleteOutlineOutlinedIcon sx={{ color: "red" }}/>
-                                        </IconButton>
-                                    </ListItem>
-                                ))}
-                            </List>
+                            <Paper sx={{marginTop: "20px"}}>
+                                <List>
+                                    {reports.map(item => (
+                                        <ListItem key={item.id}>
+                                            <ListItemText primary={`Report ${item.id}: ${item.title}`} />
+                                            <IconButton onClick={(event) => handleOpen(event, item)}>
+                                                <InfoOutlinedIcon/>
+                                            </IconButton>
+                                            <IconButton>
+                                                <DeleteOutlineOutlinedIcon sx={{ color: "red" }}/>
+                                            </IconButton>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Paper>
                         </Paper>
                     }
                     {
@@ -194,7 +191,7 @@ const Group = () => {
                                 ))}
                             </List>
                             <Button variant="contained" color="success" fullWidth sx={{marginTop: "10px", fontWeight: "800"}} onClick={confirmAdd}>
-                                <CheckIcon sx={{marginRight: "5px"}} /> Add Suggested Reports
+                                <CheckIcon sx={{marginRight: "5px"}} /> Add Reports
                             </Button>
                         </Paper>
                     }
@@ -217,7 +214,7 @@ const Group = () => {
                                                 <ListItemText
                                                     primary={
                                                         <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                                            <Typography fontWeight="500" onClick={(event) => handleOpen(event, item)} sx={{
+                                                            <Typography fontWeight="500" sx={{
                                                                 overflow: "hidden",
                                                                 textOverflow: "ellipsis",
                                                                 display: "-webkit-box",
@@ -226,6 +223,9 @@ const Group = () => {
                                                             }}>
                                                                 {`Report ${item.id}: ${item.title}`}
                                                             </Typography>
+                                                            <IconButton onClick={(event) => handleOpen(event, item)}>
+                                                                <InfoOutlinedIcon/>
+                                                            </IconButton>
                                                         </Stack>
                                                     }
                                                 />
