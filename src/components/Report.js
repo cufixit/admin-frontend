@@ -1,10 +1,17 @@
-import { Container } from "@mui/material";
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import apigClient from "../ApigClient";
-import Button from '@material-ui/core/Button';
+import {
+  Button,
+  Container,
+  Divider,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 const Report = () => {
   const params = useParams();
@@ -50,7 +57,7 @@ const Report = () => {
       //   report
       // );
       // console.log(response);
-      navigate("/new", {state: { data: report }});
+      navigate("/new", { state: { data: report } });
     } catch (error) {
       console.log(error);
     }
@@ -59,18 +66,43 @@ const Report = () => {
   return loading ? (
     ""
   ) : (
-    <Container>
-      <h1>{report.title}</h1>
-      <h2>Details</h2>
-      <div>Description: {report.description}</div>
-      <div>Location: {report.location}</div>
-      <div>Status: {report.status}</div>
-      {report.imageUrls?.map((url) => (
-        <img src={url} alt="image" key={url} />
-      ))}
-      <Button variant="contained" onClick={onSubmit}>
-        Create Group
-      </Button>
+    <Container fixed sx={{ marginTop: "100px" }}>
+      <Grid container spacing={5} justifyContent="center">
+        <Grid item xs={12} md={6} lg={7}>
+          {
+            <Paper sx={{ padding: "20px 30px 30px" }}>
+              <Typography
+                variant="h5"
+                marginBottom="10px"
+              >{`Report ${report.id}: ${report.title}`}</Typography>
+              <Divider sx={{ marginBottom: "25px" }} />
+              <Stack spacing={2}>
+                <Typography variant="body1">
+                  Description: {report.description}
+                </Typography>
+                <Typography variant="body1">
+                  Location: {report.location}
+                </Typography>
+                <Typography variant="body1">Status: {report.status}</Typography>
+                <Typography variant="body1">
+                  Date submitted: {report.date}
+                </Typography>
+              </Stack>
+              {report.imageUrls?.map((url) => (
+                <img src={url} alt="image" key={url} />
+              ))}
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ marginTop: "30px", fontWeight: "800" }}
+                onClick={onSubmit}
+              >
+                Create Group
+              </Button>
+            </Paper>
+          }
+        </Grid>
+      </Grid>
     </Container>
   );
 };
