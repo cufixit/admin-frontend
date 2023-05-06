@@ -12,11 +12,34 @@ const Reports = () => {
   const [loading, setLoading] = useState(true);
 
   let rows = [
-    { reportID: 1, title: 'Clogged sink in 2016 kitchen', description: "The sink is clogged and has been clogged since last Sunday.", location: 'East Campus', status: 'Submitted', date: "1/20/2023 2:58 PM EST" },
-    { reportID: 3, title: 'Broken radiator in 2020A', description: "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.", location: 'East Campus', status: 'In progress', date: "2/20/2023 1:00 PM EST" },
-    { reportID: 6, title: 'Air conditioner not working in 627', description: "AC doesn't work.", location: 'Mudd Hall', status: 'In progress', date: "12/2/2022 11:31 AM EST" },
+    {
+      reportID: 1,
+      title: "Clogged sink on 5th floor kitchen",
+      description:
+        "The sink is clogged and has been clogged since last Sunday.",
+      location: "Schapiro Residence Hall",
+      status: "Submitted",
+      date: "1/20/2023 2:58 PM EST",
+    },
+    {
+      reportID: 3,
+      title: "Broken radiator in 555",
+      description:
+        "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
+      location: "Alfred Lerner Hall",
+      status: "In progress",
+      date: "2/20/2023 1:00 PM EST",
+    },
+    {
+      reportID: 6,
+      title: "Air conditioner not working in 627",
+      description: "AC doesn't work.",
+      location: "Northwest Corner",
+      status: "In progress",
+      date: "12/2/2022 11:31 AM EST",
+    },
   ];
-  rows.map((row) => row["id"] = row["reportID"])
+  rows.map((row) => (row["id"] = row["reportID"]));
 
   const getReports = async () => {
     try {
@@ -49,7 +72,14 @@ const Reports = () => {
       headerName: "Details",
       sortable: false,
       renderCell: (cellValues) => {
-        return <Link to={`/reports/${cellValues.id}`} state={{ data: cellValues.row }}>Details</Link>;
+        return (
+          <Link
+            to={`/reports/${cellValues.id}`}
+            state={{ data: cellValues.row }}
+          >
+            Details
+          </Link>
+        );
       },
     },
     { field: "date" },

@@ -86,7 +86,7 @@ const App = () => {
           <Status />
           <Routes>
             <Route element={<PrivateRoutes />}>
-              <Route path="/home" element={<Home />} />
+              <Route path="/home" element={<Reports />} />
               <Route path="/reports" element={<Reports />} />
               <Route exact path="/reports/:id" element={<Report />} />
               <Route path="/groups" element={<Groups />} />

@@ -18,7 +18,7 @@ const Status = () => {
 
   return <Grid> {
     session ?
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, marginBottom: "20px" }}>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -47,8 +47,6 @@ const Status = () => {
     </Box>
     : ""
   } </Grid>;
-  
-  // return <Grid container justifyContent="flex-end">{session ? <Button variant="outlined" onClick={logout}>Log out</Button>: ""}</Grid> ;
 };
 
 export default Status;
