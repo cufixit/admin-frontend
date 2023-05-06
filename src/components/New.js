@@ -61,11 +61,10 @@ const New = () => {
     { UTS: "Union Theological Seminary" },
   ];
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
 
     const submission = {
-      id: 1,
       title: title.trim(),
       building: building,
       description: description.trim(),

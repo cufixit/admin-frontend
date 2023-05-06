@@ -34,8 +34,8 @@ const Reports = () => {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [building, setBuilding] = React.useState([]);
-  const [stat, setStat] = React.useState([]);
+  const [building, setBuilding] = React.useState("");
+  const [stat, setStat] = React.useState("");
 
   const filterByBuilding = (event) => {
     const {
@@ -58,39 +58,39 @@ const Reports = () => {
   };
 
   const buildings = [
-    ("ALT", "Altschul Hall"),
-    ("AVH", "Avery Hall"),
-    ("BAR", "Barnard Hall"),
-    ("BUT", "Butler Library"),
-    ("BWY", "Broadway Residence Hall"),
-    ("DIA", "Diana Center"),
-    ("DOD", "Dodge Building"),
-    ("FLS", "Fairchild Life Sciences Building"),
-    ("HAM", "Hamilton Hall"),
-    ("IAB", "International Affairs Building"),
-    ("JRN", "Journalism Building"),
-    ("KNT", "Kent Hall"),
-    ("KNX", "Knox Hall"),
-    ("LEH", "Lehman Hall"),
-    ("LER", "Alfred Lerner Hall"),
-    ("LEW", "Lewisohn Hall"),
-    ("MAT", "Mathematics Building"),
-    ("MCY", "Macy Hall"),
-    ("MIL", "Milbank Hall, Barnard"),
-    ("MLC", "Milstein Center, Barnard"),
-    ("MUD", "Seeley W. Mudd Building"),
-    ("NWC", "Northwest Corner"),
-    ("PHI", "Philosophy Hall"),
-    ("PRN", "Prentis Hall"),
-    ("PUP", "Pupin Laboratories"),
-    ("SCEP", "Schapiro Center"),
-    ("SCH", "Schermerhorn Hall"),
-    ("SCHP", "Schapiro Residence Hall"),
-    ("URI", "Uris Hall"),
-    ("UTS", "Union Theological Seminary"),
+    { ALT: "Altschul Hall" },
+    { AVH: "Avery Hall" },
+    { BAR: "Barnard Hall" },
+    { BUT: "Butler Library" },
+    { BWY: "Broadway Residence Hall" },
+    { DIA: "Diana Center" },
+    { DOD: "Dodge Building" },
+    { FLS: "Fairchild Life Sciences Building" },
+    { HAM: "Hamilton Hall" },
+    { IAB: "International Affairs Building" },
+    { JRN: "Journalism Building" },
+    { KNT: "Kent Hall" },
+    { KNX: "Knox Hall" },
+    { LEH: "Lehman Hall" },
+    { LER: "Alfred Lerner Hall" },
+    { LEW: "Lewisohn Hall" },
+    { MAT: "Mathematics Building" },
+    { MCY: "Macy Hall" },
+    { MIL: "Milbank Hall, Barnard" },
+    { MLC: "Milstein Center, Barnard" },
+    { MUD: "Seeley W. Mudd Building" },
+    { NWC: "Northwest Corner" },
+    { PHI: "Philosophy Hall" },
+    { PRN: "Prentis Hall" },
+    { PUP: "Pupin Laboratories" },
+    { SCEP: "Schapiro Center" },
+    { SCH: "Schermerhorn Hall" },
+    { SCHP: "Schapiro Residence Hall" },
+    { URI: "Uris Hall" },
+    { UTS: "Union Theological Seminary" },
   ];
 
-  const stats = ["Created", "In progress", "Completed"];
+  const stats = ["CREATED", "IN PROGRESS", "COMPLETED"];
 
   let rows = [
     {
@@ -98,8 +98,8 @@ const Reports = () => {
       title: "Clogged sink on 5th floor kitchen",
       description:
         "The sink is clogged and has been clogged since last Sunday.",
-      building: "SCH",
-      status: "Created",
+      building: "Schapiro Residence Hall",
+      status: "CREATED",
       date: "1/20/2023 2:58 PM EST",
       userID: 2,
     },
@@ -108,8 +108,8 @@ const Reports = () => {
       title: "Broken radiator in 555",
       description:
         "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
-      building: "LER",
-      status: "In progress",
+      building: "Alfred Lerner Hall",
+      status: "IN PROGRESS",
       date: "2/20/2023 1:00 PM EST",
       userID: 1,
     },
@@ -117,8 +117,8 @@ const Reports = () => {
       reportID: 6,
       title: "Air conditioner not working in 627",
       description: "AC doesn't work.",
-      building: "NWC",
-      status: "In progress",
+      building: "Northwest Corner",
+      status: "CREATED",
       date: "12/2/2022 11:31 AM EST",
       userID: 1,
     },
@@ -135,6 +135,26 @@ const Reports = () => {
       //   response.data.map((report) => ({ ...report, id: report.reportID }))
       // );
       setReports(rows);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const filterReports = async () => {
+    const queryParams = {
+      building: building,
+      status: stat,
+    };
+    try {
+      const response = await apigClient.invokeApi({}, "/admin/reports", "GET", {
+        headers: { Authorization: session["idToken"]["jwtToken"] },
+        queryParams: queryParams,
+      });
+      console.log(response);
+      setReports(
+        response.data.map((report) => ({ ...report, id: report.reportID }))
+      );
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -184,38 +204,23 @@ const Reports = () => {
               marginBottom: "20px",
             }}
           >
-            <InputLabel id="demo-multiple-checkbox-label">Building</InputLabel>
-            <Select
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
-              value={building}
-              onChange={filterByBuilding}
-              input={<OutlinedInput label="Tag" />}
-              renderValue={(selected) => selected.join(", ")}
-              MenuProps={MenuProps}
-            >
+            <InputLabel>Building</InputLabel>
+            <Select value={building} onChange={filterByBuilding}>
               {buildings.map((option) => (
-                <MenuItem key={option} value={option}>
-                  <Checkbox checked={building.indexOf(option) > -1} />
-                  <ListItemText primary={option} />
+                <MenuItem
+                  key={Object.keys(option)[0]}
+                  value={Object.values(option)[0]}
+                >
+                  <ListItemText primary={Object.values(option)[0]} />
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
           <FormControl sx={{ width: 120, marginBottom: "20px" }}>
-            <InputLabel id="demo-multiple-checkbox-label">Status</InputLabel>
-            <Select
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
-              value={stat}
-              onChange={filterByStatus}
-              input={<OutlinedInput label="Tag" />}
-              renderValue={(selected) => selected.join(", ")}
-              MenuProps={MenuProps}
-            >
+            <InputLabel>Status</InputLabel>
+            <Select value={stat} label="Status" onChange={filterByStatus}>
               {stats.map((option) => (
                 <MenuItem key={option} value={option}>
-                  <Checkbox checked={stat.indexOf(option) > -1} />
                   <ListItemText primary={option} />
                 </MenuItem>
               ))}

@@ -18,7 +18,7 @@ const Groups = () => {
       description:
         "The sink is clogged and has been clogged since last Sunday.",
       location: "Schapiro Residence Hall",
-      status: "Submitted",
+      status: "CREATED",
     },
     {
       groupID: 3,
@@ -26,14 +26,14 @@ const Groups = () => {
       description:
         "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
       location: "Alfred Lerner Hall",
-      status: "In progress",
+      status: "IN PROGRESS",
     },
     {
       groupID: 6,
       title: "Air conditioner not working in 627",
       description: "AC doesn't work.",
       location: "Northwest Corner",
-      status: "In progress",
+      status: "COMPLETED",
     },
   ];
   rows.map((row) => (row["id"] = row["groupID"]));
