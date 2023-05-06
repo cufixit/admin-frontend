@@ -87,6 +87,7 @@ const Report = () => {
                 <Typography variant="body1">
                   Date submitted: {report.date}
                 </Typography>
+                <Typography variant="body1">User: {report.userID}</Typography>
               </Stack>
               {report.imageUrls?.map((url) => (
                 <img src={url} alt="image" key={url} />
