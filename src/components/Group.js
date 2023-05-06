@@ -61,7 +61,7 @@ const Group = () => {
       title: "Clogged sink on 5th floor kitchen",
       description:
         "The sink is clogged and has been clogged since last Sunday.",
-      location: "Schapiro Residence Hall",
+      building: "Schapiro Residence Hall",
       status: "Submitted",
       date: "1/20/2023 2:58 PM EST",
     },
@@ -70,7 +70,7 @@ const Group = () => {
       title: "Broken radiator in 555",
       description:
         "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
-      location: "Alfred Lerner Hall",
+      building: "Alfred Lerner Hall",
       status: "In progress",
       date: "2/20/2023 1:00 PM EST",
     },
@@ -78,7 +78,7 @@ const Group = () => {
       reportID: 6,
       title: "Air conditioner not working in 627",
       description: "AC doesn't work.",
-      location: "Northwest Corner",
+      building: "Northwest Corner",
       status: "In progress",
       date: "12/2/2022 11:31 AM EST",
     },
@@ -188,7 +188,7 @@ const Group = () => {
                   Description: {data.description}
                 </Typography>
                 <Typography variant="body1">
-                  Location: {data.location}
+                  Building: {data.building}
                 </Typography>
                 <Typography variant="body1">Status: {data.status}</Typography>
               </Stack>
@@ -312,7 +312,7 @@ const Group = () => {
             {`Description: ${modalContent.description}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {`Location: ${modalContent.location}`}
+            {`Building: ${modalContent.building}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             {`Status: ${modalContent.status}`}

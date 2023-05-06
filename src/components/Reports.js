@@ -34,14 +34,14 @@ const Reports = () => {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [location, setLocation] = React.useState([]);
+  const [building, setBuilding] = React.useState([]);
   const [stat, setStat] = React.useState([]);
 
-  const filterByLocation = (event) => {
+  const filterByBuilding = (event) => {
     const {
       target: { value },
     } = event;
-    setLocation(
+    setBuilding(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
@@ -57,7 +57,7 @@ const Reports = () => {
     );
   };
 
-  const locations = [
+  const buildings = [
     ("ALT", "Altschul Hall"),
     ("AVH", "Avery Hall"),
     ("BAR", "Barnard Hall"),
@@ -90,7 +90,7 @@ const Reports = () => {
     ("UTS", "Union Theological Seminary"),
   ];
 
-  const stats = ["Submitted", "In progress", "Completed"];
+  const stats = ["Created", "In progress", "Completed"];
 
   let rows = [
     {
@@ -98,8 +98,8 @@ const Reports = () => {
       title: "Clogged sink on 5th floor kitchen",
       description:
         "The sink is clogged and has been clogged since last Sunday.",
-      location: "Schapiro Residence Hall",
-      status: "Submitted",
+      building: "SCH",
+      status: "Created",
       date: "1/20/2023 2:58 PM EST",
       userID: 2,
     },
@@ -108,7 +108,7 @@ const Reports = () => {
       title: "Broken radiator in 555",
       description:
         "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
-      location: "Alfred Lerner Hall",
+      building: "LER",
       status: "In progress",
       date: "2/20/2023 1:00 PM EST",
       userID: 1,
@@ -117,7 +117,7 @@ const Reports = () => {
       reportID: 6,
       title: "Air conditioner not working in 627",
       description: "AC doesn't work.",
-      location: "Northwest Corner",
+      building: "NWC",
       status: "In progress",
       date: "12/2/2022 11:31 AM EST",
       userID: 1,
@@ -149,7 +149,7 @@ const Reports = () => {
     { field: "reportID", headerName: "Report #", type: "number", width: 70 },
     { field: "title", headerName: "Report Title", width: 300 },
     { field: "description", headerName: "Description" },
-    { field: "location", headerName: "Location", width: 200 },
+    { field: "building", headerName: "Building", width: 200 },
     { field: "status", headerName: "Status", width: 200 },
     {
       field: "details",
@@ -184,20 +184,19 @@ const Reports = () => {
               marginBottom: "20px",
             }}
           >
-            <InputLabel id="demo-multiple-checkbox-label">Location</InputLabel>
+            <InputLabel id="demo-multiple-checkbox-label">Building</InputLabel>
             <Select
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
-              multiple
-              value={location}
-              onChange={filterByLocation}
+              value={building}
+              onChange={filterByBuilding}
               input={<OutlinedInput label="Tag" />}
               renderValue={(selected) => selected.join(", ")}
               MenuProps={MenuProps}
             >
-              {locations.map((option) => (
+              {buildings.map((option) => (
                 <MenuItem key={option} value={option}>
-                  <Checkbox checked={location.indexOf(option) > -1} />
+                  <Checkbox checked={building.indexOf(option) > -1} />
                   <ListItemText primary={option} />
                 </MenuItem>
               ))}
@@ -208,7 +207,6 @@ const Reports = () => {
             <Select
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
-              multiple
               value={stat}
               onChange={filterByStatus}
               input={<OutlinedInput label="Tag" />}

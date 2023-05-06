@@ -81,7 +81,7 @@ const Report = () => {
                   Description: {report.description}
                 </Typography>
                 <Typography variant="body1">
-                  Location: {report.location}
+                  Building: {report.building}
                 </Typography>
                 <Typography variant="body1">Status: {report.status}</Typography>
                 <Typography variant="body1">
