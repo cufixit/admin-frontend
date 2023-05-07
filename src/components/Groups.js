@@ -4,39 +4,14 @@ import { Container } from "@mui/material";
 import { Link } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
 import apigClient from "../ApigClient";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import { Grid } from "@mui/material";
 
 const Groups = () => {
   const { session } = useContext(AccountContext);
 
   const [groups, setGroups] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  let rows = [
-    {
-      groupID: 1,
-      title: "Clogged sink on 5th floor kitchen",
-      description:
-        "The sink is clogged and has been clogged since last Sunday.",
-      location: "Schapiro Residence Hall",
-      status: "CREATED",
-    },
-    {
-      groupID: 3,
-      title: "Broken radiator in 555",
-      description:
-        "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
-      location: "Alfred Lerner Hall",
-      status: "IN PROGRESS",
-    },
-    {
-      groupID: 6,
-      title: "Air conditioner not working in 627",
-      description: "AC doesn't work.",
-      location: "Northwest Corner",
-      status: "COMPLETED",
-    },
-  ];
-  rows.map((row) => (row["id"] = row["groupID"]));
 
   const getGroups = async () => {
     try {
@@ -47,7 +22,6 @@ const Groups = () => {
       setGroups(
         response.data.map((group) => ({ ...group, id: group.groupId }))
       );
-      //   setGroups(rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -62,7 +36,7 @@ const Groups = () => {
     { field: "groupId", headerName: "Group #", type: "number", width: 70 },
     { field: "title", headerName: "Report Title", width: 300 },
     { field: "description", headerName: "Description" },
-    { field: "location", headerName: "Location", width: 200 },
+    { field: "building", headerName: "Building", width: 200 },
     { field: "status", headerName: "Status", width: 200 },
     {
       field: "details",
@@ -72,11 +46,20 @@ const Groups = () => {
         return <Link to={`/groups/${cellValues.id}`}>Details</Link>;
       },
     },
-    { field: "date" },
   ];
 
   return loading ? (
-    ""
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      style={{ minHeight: "100vh" }}
+    >
+      Loading...
+      <RefreshIcon />
+    </Grid>
   ) : (
     <Container maxWidth="lg">
       <div style={{ fontSize: "200%" }}>Groups</div>
@@ -86,7 +69,6 @@ const Groups = () => {
             columns: {
               columnVisibilityModel: {
                 description: false,
-                date: false,
                 groupId: false,
               },
             },

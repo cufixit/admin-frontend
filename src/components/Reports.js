@@ -17,6 +17,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -155,7 +156,17 @@ const Reports = () => {
   ];
 
   return loading ? (
-    ""
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      style={{ minHeight: "100vh" }}
+    >
+      Loading...
+      <RefreshIcon />
+    </Grid>
   ) : (
     <Container>
       <Grid container spacing={20}>

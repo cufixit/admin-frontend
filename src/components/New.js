@@ -22,54 +22,74 @@ const New = () => {
   const navigate = useNavigate();
 
   const data = useLocation().state.data;
+  console.log(data);
+
+  const buildings = {
+    ALT: "Altschul Hall",
+    AVH: "Avery Hall",
+    BAR: "Barnard Hall",
+    BUT: "Butler Library",
+    BWY: "Broadway Residence Hall",
+    DIA: "Diana Center",
+    DOD: "Dodge Building",
+    FLS: "Fairchild Life Sciences Building",
+    HAM: "Hamilton Hall",
+    IAB: "International Affairs Building",
+    JRN: "Journalism Building",
+    KNT: "Kent Hall",
+    KNX: "Knox Hall",
+    LEH: "Lehman Hall",
+    LER: "Alfred Lerner Hall",
+    LEW: "Lewisohn Hall",
+    MAT: "Mathematics Building",
+    MCY: "Macy Hall",
+    MIL: "Milbank Hall, Barnard",
+    MLC: "Milstein Center, Barnard",
+    MUD: "Seeley W. Mudd Building",
+    NWC: "Northwest Corner",
+    PHI: "Philosophy Hall",
+    PRN: "Prentis Hall",
+    PUP: "Pupin Laboratories",
+    SCEP: "Schapiro Center",
+    SCH: "Schermerhorn Hall",
+    SCHP: "Schapiro Residence Hall",
+    URI: "Uris Hall",
+    UTS: "Union Theological Seminary",
+  };
 
   const [title, setTitle] = useState(data.title);
-  const [building, setBuilding] = useState(data.building);
+  const [building, setBuilding] = useState(buildings[data.building]);
+  const [code, setCode] = useState("");
   const [description, setDescription] = useState(data.description);
   const [status, setStatus] = useState(data.status);
 
-  const buildings = [
-    { ALT: "Altschul Hall" },
-    { AVH: "Avery Hall" },
-    { BAR: "Barnard Hall" },
-    { BUT: "Butler Library" },
-    { BWY: "Broadway Residence Hall" },
-    { DIA: "Diana Center" },
-    { DOD: "Dodge Building" },
-    { FLS: "Fairchild Life Sciences Building" },
-    { HAM: "Hamilton Hall" },
-    { IAB: "International Affairs Building" },
-    { JRN: "Journalism Building" },
-    { KNT: "Kent Hall" },
-    { KNX: "Knox Hall" },
-    { LEH: "Lehman Hall" },
-    { LER: "Alfred Lerner Hall" },
-    { LEW: "Lewisohn Hall" },
-    { MAT: "Mathematics Building" },
-    { MCY: "Macy Hall" },
-    { MIL: "Milbank Hall, Barnard" },
-    { MLC: "Milstein Center, Barnard" },
-    { MUD: "Seeley W. Mudd Building" },
-    { NWC: "Northwest Corner" },
-    { PHI: "Philosophy Hall" },
-    { PRN: "Prentis Hall" },
-    { PUP: "Pupin Laboratories" },
-    { SCEP: "Schapiro Center" },
-    { SCH: "Schermerhorn Hall" },
-    { SCHP: "Schapiro Residence Hall" },
-    { URI: "Uris Hall" },
-    { UTS: "Union Theological Seminary" },
-  ];
+  const getBuilding = (k, v) => {
+    setCode(k);
+    setBuilding(v);
+  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
 
     const submission = {
       title: title.trim(),
-      building: building,
+      building: code,
       description: description.trim(),
       status: status,
     };
+    try {
+      // const response = await apigClient.invokeApi(
+      //   {},
+      //   "/groups",
+      //   "POST",
+      //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
+      //   report
+      // );
+      // console.log(response);
+      navigate("/new", { state: { data: submission } });
+    } catch (error) {
+      console.log(error);
+    }
     console.log(submission);
     navigate("/groups/1", { state: { data: submission, report: data } });
     <Link
@@ -104,18 +124,16 @@ const New = () => {
                       <TextField
                         select
                         label="Building"
-                        defaultValue={data.building}
+                        defaultValue={building}
                         helperText="Select the location of the issue"
                       >
-                        {buildings.map((option) => (
+                        {Object.entries(buildings).map(([k, v]) => (
                           <MenuItem
-                            key={Object.keys(option)[0]}
-                            value={Object.values(option)[0]}
-                            onClick={(event) =>
-                              setBuilding(Object.keys(option)[0])
-                            }
+                            key={k}
+                            value={v}
+                            onClick={(event) => getBuilding(k, v)}
                           >
-                            {Object.values(option)[0]}
+                            {v}
                           </MenuItem>
                         ))}
                       </TextField>
@@ -124,6 +142,7 @@ const New = () => {
                       label="Description"
                       fullWidth
                       required
+                      multiline
                       onChange={(event) => setDescription(event.target.value)}
                       defaultValue={data.description}
                     />

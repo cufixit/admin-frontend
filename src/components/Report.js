@@ -12,6 +12,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const Report = () => {
   const params = useParams();
@@ -19,6 +20,7 @@ const Report = () => {
   const navigate = useNavigate();
 
   const [report, setReport] = useState(null);
+  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const getReport = async () => {
@@ -33,6 +35,7 @@ const Report = () => {
       );
       console.log(response);
       setReport(response.data.report);
+      setImages(response.data.images);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -46,14 +49,6 @@ const Report = () => {
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
-      // const response = await apigClient.invokeApi(
-      //   {},
-      //   "/admin/groups",
-      //   "POST",
-      //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
-      //   report
-      // );
-      // console.log(response);
       navigate("/new", { state: { data: report } });
     } catch (error) {
       console.log(error);
@@ -86,8 +81,8 @@ const Report = () => {
                 </Typography>
                 <Typography variant="body1">User: {report.userId}</Typography>
               </Stack>
-              {report.imageUrls?.map((url) => (
-                <img src={url} alt="image" key={url} />
+              {images.map((url) => (
+                <img width="50%" src={url} alt="image" key={url} />
               ))}
               <Button
                 type="submit"

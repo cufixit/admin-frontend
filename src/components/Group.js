@@ -212,9 +212,9 @@ const Group = () => {
           {added.length == 0 ? (
             <></>
           ) : (
-            <Paper sx={{ padding: "20px 30px 30px" }}>
+            <Paper sx={{ padding: "20px 30px 30px", margin: "30px 0px 50px" }}>
               <Typography variant="h5" marginBottom="15px">
-                Added Reports
+                Reports to Add
               </Typography>
               <List>
                 {added.map((item) => (
@@ -238,7 +238,7 @@ const Group = () => {
                 sx={{ marginTop: "10px", fontWeight: "800" }}
                 onClick={confirmAdd}
               >
-                <CheckIcon sx={{ marginRight: "5px" }} /> Add Reports
+                <CheckIcon sx={{ marginRight: "5px" }} /> Confirm Add Reports
               </Button>
             </Paper>
           )}
