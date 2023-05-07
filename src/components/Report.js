@@ -49,14 +49,28 @@ const Report = () => {
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
-      navigate("/new", { state: { data: report } });
+      if (report.groupId === null) {
+        navigate("/new", { state: { data: report } });
+      } else {
+        navigate(`/groups/${report.groupId}`);
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
   return loading ? (
-    ""
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      style={{ minHeight: "100vh" }}
+    >
+      Loading...
+      <RefreshIcon />
+    </Grid>
   ) : (
     <Container fixed sx={{ marginTop: "100px" }}>
       <Grid container spacing={5} justifyContent="center">
@@ -90,7 +104,7 @@ const Report = () => {
                 sx={{ marginTop: "30px", fontWeight: "800" }}
                 onClick={onSubmit}
               >
-                Create Group
+                {report.groupId === null ? "Create Group" : "View Group"}
               </Button>
             </Paper>
           }

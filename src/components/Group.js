@@ -118,7 +118,7 @@ const Group = () => {
     try {
       // const response = await apigClient.invokeApi(
       //   {},
-      //   `/admin/groups/${params.id}/reports`,
+      //   `/groups/${params.id}/reports`,
       //   "POST",
       //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
       //   confirmedIds
@@ -137,7 +137,7 @@ const Group = () => {
     try {
       // const response = await apigClient.invokeApi(
       //   {},
-      //   `admin/groups/${params.id}`,
+      //   `/groups/${params.id}`,
       //   "GET",
       //   {
       //     headers: { Authorization: session["idToken"]["jwtToken"] },
@@ -156,11 +156,12 @@ const Group = () => {
     try {
       // const response = await apigClient.invokeApi(
       //     {},
-      //     `/admin/groups/suggested`,
+      //     `/groups/${params.id}/suggest`,
       //     "GET",
       //     { headers: { Authorization: session["idToken"]["jwtToken"] } },
       // );
       // console.log(response);
+      // setSuggested(response.data);
       setSuggested(rows);
     } catch (error) {
       console.log(error);

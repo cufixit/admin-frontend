@@ -8,12 +8,16 @@ import {
   Checkbox,
   Container,
   FormControl,
+  FormControlLabel,
+  FormLabel,
   Grid,
   InputLabel,
   ListItemText,
   MenuItem,
   OutlinedInput,
   Paper,
+  Radio,
+  RadioGroup,
   Select,
   TextField,
 } from "@mui/material";
@@ -40,6 +44,7 @@ const Reports = () => {
   const [building, setBuilding] = React.useState("");
   const [code, setCode] = React.useState("");
   const [stat, setStat] = React.useState("");
+  const [grouped, setGrouped] = React.useState(false);
 
   const filterByBuilding = (k, v) => {
     setCode(k);
@@ -54,6 +59,10 @@ const Reports = () => {
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
+  };
+
+  const checkGrouped = (event) => {
+    setGrouped(event.target.checked);
   };
 
   const buildings = [
@@ -220,6 +229,18 @@ const Reports = () => {
                 </MenuItem>
               ))}
             </Select>
+          </FormControl>
+          <FormControl
+            sx={{
+              width: 120,
+              marginTop: "20px",
+              marginBottom: "20px",
+            }}
+          >
+            <FormControlLabel
+              control={<Checkbox checked={grouped} onChange={checkGrouped} />}
+              label="Grouped"
+            />
           </FormControl>
           <Button type="submit" variant="contained" onClick={filterReports}>
             Filter
