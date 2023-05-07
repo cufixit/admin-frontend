@@ -15,6 +15,7 @@ import {
   OutlinedInput,
   Paper,
   Select,
+  TextField,
 } from "@mui/material";
 
 const ITEM_HEIGHT = 48;
@@ -34,17 +35,14 @@ const Reports = () => {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [queryString, setQueryString] = React.useState("");
   const [building, setBuilding] = React.useState("");
+  const [code, setCode] = React.useState("");
   const [stat, setStat] = React.useState("");
 
-  const filterByBuilding = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setBuilding(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+  const filterByBuilding = (k, v) => {
+    setCode(k);
+    setBuilding(v);
   };
 
   const filterByStatus = (event) => {
@@ -92,49 +90,18 @@ const Reports = () => {
 
   const stats = ["CREATED", "IN PROGRESS", "COMPLETED"];
 
-  let rows = [
-    {
-      reportID: 1,
-      title: "Clogged sink on 5th floor kitchen",
-      description:
-        "The sink is clogged and has been clogged since last Sunday.",
-      building: "Schapiro Residence Hall",
-      status: "CREATED",
-      date: "1/20/2023 2:58 PM EST",
-      userID: 2,
-    },
-    {
-      reportID: 3,
-      title: "Broken radiator in 555",
-      description:
-        "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
-      building: "Alfred Lerner Hall",
-      status: "IN PROGRESS",
-      date: "2/20/2023 1:00 PM EST",
-      userID: 1,
-    },
-    {
-      reportID: 6,
-      title: "Air conditioner not working in 627",
-      description: "AC doesn't work.",
-      building: "Northwest Corner",
-      status: "CREATED",
-      date: "12/2/2022 11:31 AM EST",
-      userID: 1,
-    },
-  ];
-  rows.map((row) => (row["id"] = row["reportID"]));
-
   const getReports = async () => {
     try {
-      // const response = await apigClient.invokeApi({}, "/admin/reports", "GET", {
-      //   headers: { Authorization: session["idToken"]["jwtToken"] },
-      // });
-      // console.log(response);
-      // setReports(
-      //   response.data.map((report) => ({ ...report, id: report.reportID }))
-      // );
-      setReports(rows);
+      const response = await apigClient.invokeApi({}, "/reports", "GET", {
+        headers: { Authorization: session["idToken"]["jwtToken"] },
+      });
+      console.log(response);
+      setReports(
+        response.data.reports.map((report) => ({
+          ...report,
+          id: report.reportId,
+        }))
+      );
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -143,17 +110,21 @@ const Reports = () => {
 
   const filterReports = async () => {
     const queryParams = {
-      building: building,
+      q: queryString,
       status: stat,
+      building: code,
     };
     try {
-      const response = await apigClient.invokeApi({}, "/admin/reports", "GET", {
+      const response = await apigClient.invokeApi({}, "/reports", "GET", {
         headers: { Authorization: session["idToken"]["jwtToken"] },
         queryParams: queryParams,
       });
       console.log(response);
       setReports(
-        response.data.map((report) => ({ ...report, id: report.reportID }))
+        response.data.reports.map((report) => ({
+          ...report,
+          id: report.reportId,
+        }))
       );
       setLoading(false);
     } catch (error) {
@@ -166,7 +137,7 @@ const Reports = () => {
   }, []);
 
   const columns = [
-    { field: "reportID", headerName: "Report #", type: "number", width: 70 },
+    { field: "reportId", headerName: "Report #", type: "number", width: 70 },
     { field: "title", headerName: "Report Title", width: 300 },
     { field: "description", headerName: "Description" },
     { field: "building", headerName: "Building", width: 200 },
@@ -176,18 +147,11 @@ const Reports = () => {
       headerName: "Details",
       sortable: false,
       renderCell: (cellValues) => {
-        return (
-          <Link
-            to={`/reports/${cellValues.id}`}
-            state={{ data: cellValues.row }}
-          >
-            Details
-          </Link>
-        );
+        return <Link to={`/reports/${cellValues.id}`}>Details</Link>;
       },
     },
     { field: "date" },
-    { field: "userID" },
+    { field: "userId" },
   ];
 
   return loading ? (
@@ -201,15 +165,35 @@ const Reports = () => {
             sx={{
               width: 120,
               marginTop: "20px",
+            }}
+          >
+            <TextField
+              id="standard-search"
+              label="Search field"
+              type="search"
+              variant="standard"
+              onChange={(event) => setQueryString(event.target.value)}
+            />
+          </FormControl>
+          <FormControl
+            sx={{
+              width: 120,
+              marginTop: "20px",
               marginBottom: "20px",
             }}
           >
             <InputLabel>Building</InputLabel>
-            <Select value={building} onChange={filterByBuilding}>
+            <Select value={building}>
               {buildings.map((option) => (
                 <MenuItem
                   key={Object.keys(option)[0]}
                   value={Object.values(option)[0]}
+                  onClick={(event) =>
+                    filterByBuilding(
+                      Object.keys(option)[0],
+                      Object.values(option)[0]
+                    )
+                  }
                 >
                   <ListItemText primary={Object.values(option)[0]} />
                 </MenuItem>
@@ -226,7 +210,7 @@ const Reports = () => {
               ))}
             </Select>
           </FormControl>
-          <Button type="submit" variant="contained">
+          <Button type="submit" variant="contained" onClick={filterReports}>
             Filter
           </Button>
         </Grid>
@@ -237,9 +221,10 @@ const Reports = () => {
               initialState={{
                 columns: {
                   columnVisibilityModel: {
+                    reportId: false,
                     description: false,
                     date: false,
-                    userID: false,
+                    userId: false,
                   },
                 },
               }}

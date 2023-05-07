@@ -104,7 +104,7 @@ const New = () => {
                       <TextField
                         select
                         label="Building"
-                        defaultValue="Altschul Hall"
+                        defaultValue={data.building}
                         helperText="Select the location of the issue"
                       >
                         {buildings.map((option) => (

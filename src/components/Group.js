@@ -196,9 +196,7 @@ const Group = () => {
                 <List>
                   {reports.map((item) => (
                     <ListItem key={item.id}>
-                      <ListItemText
-                        primary={`Report ${item.id}: ${item.title}`}
-                      />
+                      <ListItemText primary={`${item.title}`} />
                       <IconButton onClick={(event) => handleOpen(event, item)}>
                         <InfoOutlinedIcon />
                       </IconButton>
@@ -221,9 +219,7 @@ const Group = () => {
               <List>
                 {added.map((item) => (
                   <ListItem key={item.id}>
-                    <ListItemText
-                      primary={`Report ${item.id}: ${item.title}`}
-                    />
+                    <ListItemText primary={`${item.title}`} />
                     <IconButton onClick={(event) => handleOpen(event, item)}>
                       <InfoOutlinedIcon />
                     </IconButton>
@@ -280,7 +276,7 @@ const Group = () => {
                                 WebkitBoxOrient: "vertical",
                               }}
                             >
-                              {`Report ${item.id}: ${item.title}`}
+                              {`${item.title}`}
                             </Typography>
                             <IconButton
                               onClick={(event) => handleOpen(event, item)}
@@ -306,7 +302,7 @@ const Group = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            {`Report ${modalContent.id}: ${modalContent.title}`}
+            {`${modalContent.title}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 3 }}>
             {`Description: ${modalContent.description}`}

@@ -21,21 +21,18 @@ const Report = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  let location = useLocation();
-
   const getReport = async () => {
     try {
-      // const response = await apigClient.invokeApi(
-      //   {},
-      //   `/admin/reports/${params.id}`,
-      //   "GET",
-      //   {
-      //     headers: { Authorization: session["idToken"]["jwtToken"] },
-      //   }
-      // );
-      // console.log(response);
-      // setReport(response.data);
-      setReport(location.state.data);
+      const response = await apigClient.invokeApi(
+        {},
+        `/reports/${params.id}`,
+        "GET",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        }
+      );
+      console.log(response);
+      setReport(response.data.report);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -74,7 +71,7 @@ const Report = () => {
               <Typography
                 variant="h5"
                 marginBottom="10px"
-              >{`Report ${report.id}: ${report.title}`}</Typography>
+              >{`${report.title}`}</Typography>
               <Divider sx={{ marginBottom: "25px" }} />
               <Stack spacing={2}>
                 <Typography variant="body1">
@@ -85,9 +82,9 @@ const Report = () => {
                 </Typography>
                 <Typography variant="body1">Status: {report.status}</Typography>
                 <Typography variant="body1">
-                  Date submitted: {report.date}
+                  Date submitted: {report.createdDate}
                 </Typography>
-                <Typography variant="body1">User: {report.userID}</Typography>
+                <Typography variant="body1">User: {report.userId}</Typography>
               </Stack>
               {report.imageUrls?.map((url) => (
                 <img src={url} alt="image" key={url} />

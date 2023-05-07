@@ -38,16 +38,16 @@ const Groups = () => {
   ];
   rows.map((row) => (row["id"] = row["groupID"]));
 
-  const getReports = async () => {
+  const getGroups = async () => {
     try {
-      // const response = await apigClient.invokeApi({}, "/admin/reports", "GET", {
-      //   headers: { Authorization: session["idToken"]["jwtToken"] },
-      // });
-      // console.log(response);
-      // setReports(
-      //   response.data.map((report) => ({ ...report, id: report.reportID }))
-      // );
-      setGroups(rows);
+      const response = await apigClient.invokeApi({}, "/groups", "GET", {
+        headers: { Authorization: session["idToken"]["jwtToken"] },
+      });
+      console.log(response);
+      setGroups(
+        response.data.map((group) => ({ ...group, id: group.groupId }))
+      );
+      //   setGroups(rows);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -55,11 +55,11 @@ const Groups = () => {
   };
 
   useEffect(() => {
-    getReports();
+    getGroups();
   }, []);
 
   const columns = [
-    { field: "groupID", headerName: "Group #", type: "number", width: 70 },
+    { field: "groupId", headerName: "Group #", type: "number", width: 70 },
     { field: "title", headerName: "Report Title", width: 300 },
     { field: "description", headerName: "Description" },
     { field: "location", headerName: "Location", width: 200 },
@@ -69,14 +69,7 @@ const Groups = () => {
       headerName: "Details",
       sortable: false,
       renderCell: (cellValues) => {
-        return (
-          <Link
-            to={`/groups/${cellValues.id}`}
-            state={{ data: cellValues.row }}
-          >
-            Details
-          </Link>
-        );
+        return <Link to={`/groups/${cellValues.id}`}>Details</Link>;
       },
     },
     { field: "date" },
@@ -94,6 +87,7 @@ const Groups = () => {
               columnVisibilityModel: {
                 description: false,
                 date: false,
+                groupId: false,
               },
             },
           }}
