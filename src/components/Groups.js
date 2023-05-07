@@ -5,19 +5,12 @@ import { AccountContext } from "./AccountContext";
 import apigClient from "../ApigClient";
 import {
   Button,
-  Checkbox,
   Container,
   FormControl,
-  FormControlLabel,
-  FormLabel,
   Grid,
   InputLabel,
   ListItemText,
   MenuItem,
-  OutlinedInput,
-  Paper,
-  Radio,
-  RadioGroup,
   Select,
   TextField,
 } from "@mui/material";
@@ -235,25 +228,6 @@ const Groups = () => {
         </Grid>
       </Grid>
     </Container>
-    // <Container maxWidth="lg">
-    //   <div style={{ fontSize: "200%" }}>Groups</div>
-    //   <div style={{ height: 600, width: "100%" }}>
-    //     <DataGrid
-    //       initialState={{
-    //         columns: {
-    //           columnVisibilityModel: {
-    //             description: false,
-    //             groupId: false,
-    //           },
-    //         },
-    //       }}
-    //       rows={groups}
-    //       columns={columns}
-    //       pageSize={5}
-    //       rowsPerPageOptions={[5]}
-    //     />
-    //   </div>
-    // </Container>
   );
 };
 

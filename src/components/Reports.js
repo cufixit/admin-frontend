@@ -9,30 +9,14 @@ import {
   Container,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   InputLabel,
   ListItemText,
   MenuItem,
-  OutlinedInput,
-  Paper,
-  Radio,
-  RadioGroup,
   Select,
   TextField,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const Reports = () => {
   const { session } = useContext(AccountContext);
@@ -105,7 +89,6 @@ const Reports = () => {
       const response = await apigClient.invokeApi({}, "/reports", "GET", {
         headers: { Authorization: session["idToken"]["jwtToken"] },
       });
-      console.log(response);
       setReports(
         response.data.reports.map((report) => ({
           ...report,

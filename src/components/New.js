@@ -63,7 +63,7 @@ const New = () => {
   const [building, setBuilding] = useState(buildings[data.building]);
   const [code, setCode] = useState(data.building);
   const [description, setDescription] = useState(data.description);
-  const [status, setStatus] = useState(data.status);
+  const [reports, setReports] = useState([data.reportId]);
 
   const getBuilding = (k, v) => {
     setCode(k);
@@ -77,6 +77,7 @@ const New = () => {
       title: title.trim(),
       building: code,
       description: description.trim(),
+      reports: reports,
     };
     try {
       const response = await apigClient.invokeApi(
@@ -86,7 +87,6 @@ const New = () => {
         { headers: { Authorization: session["idToken"]["jwtToken"] } },
         submission
       );
-      console.log(response);
       navigate("/groups");
     } catch (error) {
       console.log(error);
