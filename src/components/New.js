@@ -77,7 +77,6 @@ const New = () => {
       title: title.trim(),
       building: code,
       description: description.trim(),
-      status: status,
     };
     try {
       const response = await apigClient.invokeApi(
@@ -88,7 +87,7 @@ const New = () => {
         submission
       );
       console.log(response);
-      navigate(`/groups/${response.data.groupId}`);
+      navigate("/groups");
     } catch (error) {
       console.log(error);
     }

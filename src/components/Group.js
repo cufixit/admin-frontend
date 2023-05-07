@@ -25,10 +25,14 @@ import {
 } from "@mui/material";
 
 const Group = () => {
-  let location = useLocation();
-  const data = location.state.data;
-  const report = location.state.report;
-  const [reports, setReports] = useState([report]);
+  const params = useParams();
+  const { session } = useContext(AccountContext);
+
+  //   let location = useLocation();
+  //   const data = location.state.data;
+  //   const report = location.state.report;
+  const [reports, setReports] = useState([]);
+  const [group, setGroup] = useState(null);
   const [suggested, setSuggested] = useState(null);
   const [added, setAdded] = useState([]);
   const [confirmedIds, setConfirmedIds] = useState([]);
@@ -38,8 +42,7 @@ const Group = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = async (event, item) => {
     event.preventDefault();
-    setOpen(true);
-    setModalContent(item);
+    getReport(item);
   };
   const handleClose = () => setOpen(false);
 
@@ -133,19 +136,44 @@ const Group = () => {
   };
 
   // Gets the reports that are in the group
-  const getReports = async () => {
+  const getGroup = async () => {
     try {
-      // const response = await apigClient.invokeApi(
-      //   {},
-      //   `/groups/${params.id}`,
-      //   "GET",
-      //   {
-      //     headers: { Authorization: session["idToken"]["jwtToken"] },
-      //   }
-      // );
-      // console.log(response);
-      // setReports(response.data);
-      setReports(reports);
+      const response = await apigClient.invokeApi(
+        {},
+        `/groups/${params.id}`,
+        "GET",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        }
+      );
+      console.log(response);
+      setGroup(response.data.group);
+      setReports(
+        response.data.reports.map((report) => ({
+          ...report,
+          id: report.reportId,
+        }))
+      );
+      //   setReports(reports);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Gets specific report
+  const getReport = async (item) => {
+    try {
+      const response = await apigClient.invokeApi(
+        {},
+        `/reports/${item.id}`,
+        "GET",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        }
+      );
+      console.log(response);
+      setModalContent(response.data.report);
+      setOpen(true);
     } catch (error) {
       console.log(error);
     }
@@ -154,22 +182,22 @@ const Group = () => {
   // Gets suggested reports
   const getSuggested = async () => {
     try {
-      // const response = await apigClient.invokeApi(
-      //     {},
-      //     `/groups/${params.id}/suggest`,
-      //     "GET",
-      //     { headers: { Authorization: session["idToken"]["jwtToken"] } },
-      // );
-      // console.log(response);
-      // setSuggested(response.data);
-      setSuggested(rows);
+      const response = await apigClient.invokeApi(
+        {},
+        `/groups/${params.id}/suggest`,
+        "GET",
+        { headers: { Authorization: session["idToken"]["jwtToken"] } }
+      );
+      console.log(response);
+      setSuggested(response.data.reports);
+      //   setSuggested(rows);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    getReports();
+    getGroup();
     getSuggested();
   }, []);
 
@@ -182,16 +210,16 @@ const Group = () => {
               <Typography
                 variant="h5"
                 marginBottom="10px"
-              >{`Group ${data.id}: ${data.title}`}</Typography>
+              >{`${group?.title}`}</Typography>
               <Divider sx={{ marginBottom: "25px" }} />
               <Stack spacing={2}>
                 <Typography variant="body1">
-                  Description: {data.description}
+                  Description: {group?.description}
                 </Typography>
                 <Typography variant="body1">
-                  Building: {data.building}
+                  Building: {group?.building}
                 </Typography>
-                <Typography variant="body1">Status: {data.status}</Typography>
+                <Typography variant="body1">Status: {group?.status}</Typography>
               </Stack>
               <Paper sx={{ marginTop: "20px" }}>
                 <List>
@@ -315,7 +343,10 @@ const Group = () => {
             {`Status: ${modalContent.status}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {`Date Submitted: ${modalContent.date}`}
+            {`Date Submitted: ${modalContent.createdDate}`}
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            {`User ID: ${modalContent.userId}`}
           </Typography>
         </Box>
       </Modal>

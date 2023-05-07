@@ -20,7 +20,7 @@ const Groups = () => {
       });
       console.log(response);
       setGroups(
-        response.data.map((group) => ({ ...group, id: group.groupId }))
+        response.data.groups.map((group) => ({ ...group, id: group.groupId }))
       );
       setLoading(false);
     } catch (error) {
