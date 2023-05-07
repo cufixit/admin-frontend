@@ -13,6 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
+import apigClient from "../ApigClient";
+
 // import AWS from 'aws-sdk';
 // import apigClientFactory from '../sdk/apigClient';
 
@@ -59,7 +61,7 @@ const New = () => {
 
   const [title, setTitle] = useState(data.title);
   const [building, setBuilding] = useState(buildings[data.building]);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(data.building);
   const [description, setDescription] = useState(data.description);
   const [status, setStatus] = useState(data.status);
 
@@ -78,26 +80,18 @@ const New = () => {
       status: status,
     };
     try {
-      // const response = await apigClient.invokeApi(
-      //   {},
-      //   "/groups",
-      //   "POST",
-      //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
-      //   report
-      // );
-      // console.log(response);
-      navigate("/new", { state: { data: submission } });
+      const response = await apigClient.invokeApi(
+        {},
+        "/groups",
+        "POST",
+        { headers: { Authorization: session["idToken"]["jwtToken"] } },
+        submission
+      );
+      console.log(response);
+      navigate(`/groups/${response.data.groupId}`);
     } catch (error) {
       console.log(error);
     }
-    console.log(submission);
-    navigate("/groups/1", { state: { data: submission, report: data } });
-    <Link
-      to={{
-        pathname: "/groups/1",
-        state: { data: submission },
-      }}
-    />;
   };
 
   return (
