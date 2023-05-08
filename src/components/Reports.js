@@ -6,6 +6,7 @@ import apigClient from "../ApigClient";
 import {
   Button,
   Checkbox,
+  Chip,
   Container,
   FormControl,
   FormControlLabel,
@@ -14,134 +15,84 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Stack,
   TextField,
+  Typography,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+
+const BUILDINGS = {
+  ALT: "Altschul Hall",
+  AVH: "Avery Hall",
+  BAR: "Barnard Hall",
+  BUT: "Butler Library",
+  BWY: "Broadway Residence Hall",
+  DIA: "Diana Center",
+  DOD: "Dodge Building",
+  FLS: "Fairchild Life Sciences Building",
+  HAM: "Hamilton Hall",
+  IAB: "International Affairs Building",
+  JRN: "Journalism Building",
+  KNT: "Kent Hall",
+  KNX: "Knox Hall",
+  LEH: "Lehman Hall",
+  LER: "Alfred Lerner Hall",
+  LEW: "Lewisohn Hall",
+  MAT: "Mathematics Building",
+  MCY: "Macy Hall",
+  MIL: "Milbank Hall, Barnard",
+  MLC: "Milstein Center, Barnard",
+  MUD: "Seeley W. Mudd Building",
+  NWC: "Northwest Corner",
+  PHI: "Philosophy Hall",
+  PRN: "Prentis Hall",
+  PUP: "Pupin Laboratories",
+  SCEP: "Schapiro Center",
+  SCH: "Schermerhorn Hall",
+  SCHP: "Schapiro Residence Hall",
+  URI: "Uris Hall",
+  UTS: "Union Theological Seminary",
+};
+
+const STATUSES = ["SUBMITTED", "PROCESSING", "RESOLVED"];
 
 const Reports = () => {
   const { session } = useContext(AccountContext);
 
+  const [totalHits, setTotalHits] = useState(undefined);
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [queryString, setQueryString] = useState("");
-  const [building, setBuilding] = useState("");
-  const [code, setCode] = useState("");
-  const [stat, setStat] = useState("");
-  const [ungrouped, setUngrouped] = useState(false);
+  const [buildingFilter, setBuildingFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [ungroupedFilter, setUngroupedFilter] = useState(false);
 
-  // const [rowCount, setRowCount] = useState(0);
-  // const [paginationModel, setPaginationModel] = useState({
-  //   pageSize: 1,
-  //   page: 0,
-  // });
-  // const [rowCountState, setRowCountState] = useState(rowCount);
-
-  // useEffect(() => {
-  //   setRowCountState((prevRowCountState) =>
-  //     rowCount !== undefined ? rowCount : prevRowCountState
-  //   );
-  // }, [rowCount, setRowCountState]);
-
-  const filterByBuilding = (k, v) => {
-    setCode(k);
-    setBuilding(v);
-  };
-
-  const filterByStatus = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setStat(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
-
-  const checkUngrouped = (event) => {
-    setUngrouped(event.target.checked);
-  };
-
-  const buildings = [
-    { ALT: "Altschul Hall" },
-    { AVH: "Avery Hall" },
-    { BAR: "Barnard Hall" },
-    { BUT: "Butler Library" },
-    { BWY: "Broadway Residence Hall" },
-    { DIA: "Diana Center" },
-    { DOD: "Dodge Building" },
-    { FLS: "Fairchild Life Sciences Building" },
-    { HAM: "Hamilton Hall" },
-    { IAB: "International Affairs Building" },
-    { JRN: "Journalism Building" },
-    { KNT: "Kent Hall" },
-    { KNX: "Knox Hall" },
-    { LEH: "Lehman Hall" },
-    { LER: "Alfred Lerner Hall" },
-    { LEW: "Lewisohn Hall" },
-    { MAT: "Mathematics Building" },
-    { MCY: "Macy Hall" },
-    { MIL: "Milbank Hall, Barnard" },
-    { MLC: "Milstein Center, Barnard" },
-    { MUD: "Seeley W. Mudd Building" },
-    { NWC: "Northwest Corner" },
-    { PHI: "Philosophy Hall" },
-    { PRN: "Prentis Hall" },
-    { PUP: "Pupin Laboratories" },
-    { SCEP: "Schapiro Center" },
-    { SCH: "Schermerhorn Hall" },
-    { SCHP: "Schapiro Residence Hall" },
-    { URI: "Uris Hall" },
-    { UTS: "Union Theological Seminary" },
-  ];
-
-  const stats = ["SUBMITTED", "PROCESSING", "RESOLVED"];
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
   const getReports = async () => {
-    // const queryParams = {
-    //   from: paginationModel.page,
-    //   size: paginationModel.pageSize,
-    // };
-    try {
-      const response = await apigClient.invokeApi({}, "/reports", "GET", {
-        headers: { Authorization: session["idToken"]["jwtToken"] },
-        // queryParams: queryParams,
-      });
-      setReports(
-        response.data.reports.map((report) => ({
-          ...report,
-          id: report.reportId,
-        }))
-      );
-      // setRowCount(response.data.reports.length);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const filterReports = async () => {
     const queryParams = {
       q: queryString,
-      status: stat,
-      building: code,
-      ungrouped: ungrouped,
-      // from: paginationModel.page,
-      // size: paginationModel.pageSize,
+      status: statusFilter,
+      building: buildingFilter,
+      ungrouped: ungroupedFilter,
+      from: paginationModel.page * paginationModel.pageSize,
+      size: paginationModel.pageSize,
     };
     try {
       const response = await apigClient.invokeApi({}, "/reports", "GET", {
         headers: { Authorization: session["idToken"]["jwtToken"] },
         queryParams: queryParams,
       });
-      console.log(response);
       setReports(
         response.data.reports.map((report) => ({
           ...report,
           id: report.reportId,
         }))
       );
-      // setRowCount(response.data.reports.length);
+      setTotalHits(response.data.total);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -149,134 +100,123 @@ const Reports = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     getReports();
-  }, []);
+  }, [paginationModel]);
 
   const columns = [
-    { field: "reportId", headerName: "Report #", type: "number", width: 70 },
-    { field: "title", headerName: "Report Title", width: 300 },
-    { field: "description", headerName: "Description" },
-    { field: "building", headerName: "Building", width: 200 },
-    { field: "status", headerName: "Status", width: 200 },
+    { field: "title", headerName: "Report Title", sortable: false, width: 300 },
+    {
+      field: "description",
+      headerName: "Description",
+      sortable: false,
+      width: 200,
+    },
+    { field: "building", headerName: "Building", sortable: false, width: 80 },
+    {
+      field: "status",
+      headerName: "Status",
+      sortable: false,
+      width: 130,
+      renderCell: (cellValues) => <Chip label={cellValues.value} />,
+    },
     {
       field: "details",
       headerName: "Details",
       sortable: false,
-      renderCell: (cellValues) => {
-        return <Link to={`/reports/${cellValues.id}`}>Details</Link>;
-      },
+      width: 100,
+      renderCell: (cellValues) => (
+        <Button
+          variant="text"
+          component={Link}
+          to={`/reports/${cellValues.id}`}
+        >
+          Details
+        </Button>
+      ),
     },
-    { field: "date" },
-    { field: "userId" },
   ];
 
-  return loading ? (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "100vh" }}
-    >
-      Loading...
-      <RefreshIcon />
-    </Grid>
-  ) : (
+  return (
     <Container>
-      <Grid container spacing={20}>
-        <Grid item xs={1} md={1} lg={1}>
-          <div>Filters</div>
-          <FormControl
-            sx={{
-              width: 120,
-              marginTop: "20px",
-            }}
-          >
-            <TextField
-              id="standard-search"
-              label="Search field"
-              type="search"
-              variant="standard"
-              onChange={(event) => setQueryString(event.target.value)}
-            />
-          </FormControl>
-          <FormControl
-            sx={{
-              width: 120,
-              marginTop: "20px",
-              marginBottom: "20px",
-            }}
-          >
-            <InputLabel>Building</InputLabel>
-            <Select value={building}>
-              {buildings.map((option) => (
-                <MenuItem
-                  key={Object.keys(option)[0]}
-                  value={Object.values(option)[0]}
-                  onClick={(event) =>
-                    filterByBuilding(
-                      Object.keys(option)[0],
-                      Object.values(option)[0]
-                    )
-                  }
-                >
-                  <ListItemText primary={Object.values(option)[0]} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl sx={{ width: 120, marginBottom: "20px" }}>
-            <InputLabel>Status</InputLabel>
-            <Select value={stat} label="Status" onChange={filterByStatus}>
-              {stats.map((option) => (
-                <MenuItem key={option} value={option}>
-                  <ListItemText primary={option} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl
-            sx={{
-              width: 120,
-              marginTop: "20px",
-              marginBottom: "20px",
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox checked={ungrouped} onChange={checkUngrouped} />
-              }
-              label="Ungrouped"
-            />
-          </FormControl>
-          <Button type="submit" variant="contained" onClick={filterReports}>
-            Filter
-          </Button>
-        </Grid>
-        <Grid item xs={10} md={10} lg={10}>
-          {/* <div style={{ fontSize: "200%" }}>Reports</div> */}
-          <div style={{ height: 600, width: "100%" }}>
-            <DataGrid
-              initialState={{
-                columns: {
-                  columnVisibilityModel: {
-                    reportId: false,
-                    description: false,
-                    date: false,
-                    userId: false,
-                  },
-                },
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={4} md={3} lg={2}>
+          <Typography variant="h6" sx={{ marginTop: "10px" }}>
+            Filter By
+          </Typography>
+          <Stack spacing={2} sx={{ marginTop: "10px" }}>
+            <FormControl fullWidth>
+              <TextField
+                label="Search field"
+                type="search"
+                variant="standard"
+                onChange={(event) => setQueryString(event.target.value)}
+              />
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Building</InputLabel>
+              <Select
+                value={buildingFilter}
+                label="Building"
+                onChange={(event) => {
+                  setBuildingFilter(event.target.value);
+                }}
+              >
+                {Object.entries(BUILDINGS).map(([k, v]) => (
+                  <MenuItem key={k} value={k}>
+                    <ListItemText primary={v} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={statusFilter}
+                label="Status"
+                onChange={(event) => {
+                  setStatusFilter(event.target.value);
+                }}
+              >
+                {STATUSES.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <ListItemText primary={option} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <FormControlLabel
+                control={<Checkbox checked={ungroupedFilter} />}
+                label="Ungrouped only"
+                onChange={(event) => {
+                  setUngroupedFilter(event.target.checked);
+                }}
+              />
+            </FormControl>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={() => {
+                getReports();
               }}
-              rows={reports}
-              columns={columns}
-              // rowCount={rowCountState}
-              // pageSizeOptions={[paginationModel.pageSize]}
-              // paginationModel={paginationModel}
-              // paginationMode="server"
-              // onPaginationModelChange={setPaginationModel}
-            />
-          </div>
+            >
+              Filter
+            </Button>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} sm={8} md={9} lg={10}>
+          <DataGrid
+            autoHeight
+            rows={reports}
+            columns={columns}
+            loading={loading}
+            rowCount={totalHits || 0}
+            pageSizeOptions={[10, 20, 30]}
+            paginationModel={paginationModel}
+            paginationMode="server"
+            onPaginationModelChange={setPaginationModel}
+          />
         </Grid>
       </Grid>
     </Container>
