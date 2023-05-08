@@ -5,6 +5,7 @@ import { AccountContext } from "./AccountContext";
 import apigClient from "../ApigClient";
 import {
   Button,
+  Chip,
   Container,
   FormControl,
   Grid,
@@ -12,103 +13,48 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Stack,
   TextField,
+  Typography,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import { BUILDINGS, STATUSES } from "../constants";
 
 const Groups = () => {
   const { session } = useContext(AccountContext);
 
-  const [groups, setGroups] = useState(null);
+  const [totalHits, setTotalHits] = useState(undefined);
+  const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [queryString, setQueryString] = React.useState("");
-  const [building, setBuilding] = React.useState("");
-  const [code, setCode] = React.useState("");
-  const [stat, setStat] = React.useState("");
 
-  const filterByBuilding = (k, v) => {
-    setCode(k);
-    setBuilding(v);
-  };
+  const [queryString, setQueryString] = useState("");
+  const [buildingFilter, setBuildingFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
-  const filterByStatus = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setStat(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
-  const buildings = [
-    { ALT: "Altschul Hall" },
-    { AVH: "Avery Hall" },
-    { BAR: "Barnard Hall" },
-    { BUT: "Butler Library" },
-    { BWY: "Broadway Residence Hall" },
-    { DIA: "Diana Center" },
-    { DOD: "Dodge Building" },
-    { FLS: "Fairchild Life Sciences Building" },
-    { HAM: "Hamilton Hall" },
-    { IAB: "International Affairs Building" },
-    { JRN: "Journalism Building" },
-    { KNT: "Kent Hall" },
-    { KNX: "Knox Hall" },
-    { LEH: "Lehman Hall" },
-    { LER: "Alfred Lerner Hall" },
-    { LEW: "Lewisohn Hall" },
-    { MAT: "Mathematics Building" },
-    { MCY: "Macy Hall" },
-    { MIL: "Milbank Hall, Barnard" },
-    { MLC: "Milstein Center, Barnard" },
-    { MUD: "Seeley W. Mudd Building" },
-    { NWC: "Northwest Corner" },
-    { PHI: "Philosophy Hall" },
-    { PRN: "Prentis Hall" },
-    { PUP: "Pupin Laboratories" },
-    { SCEP: "Schapiro Center" },
-    { SCH: "Schermerhorn Hall" },
-    { SCHP: "Schapiro Residence Hall" },
-    { URI: "Uris Hall" },
-    { UTS: "Union Theological Seminary" },
-  ];
-
-  const stats = ["SUBMITTED", "PROCESSING", "RESOLVED"];
-
-  const filterGroups = async () => {
+  const getGroups = async () => {
     const queryParams = {
       q: queryString,
-      status: stat,
-      building: code,
+      status: statusFilter,
+      building: buildingFilter,
+      from: paginationModel.page * paginationModel.pageSize,
+      size: paginationModel.pageSize,
     };
     try {
       const response = await apigClient.invokeApi({}, "/groups", "GET", {
         headers: { Authorization: session["idToken"]["jwtToken"] },
         queryParams: queryParams,
       });
-      console.log(response);
       setGroups(
         response.data.groups.map((group) => ({
           ...group,
           id: group.groupId,
         }))
       );
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getGroups = async () => {
-    try {
-      const response = await apigClient.invokeApi({}, "/groups", "GET", {
-        headers: { Authorization: session["idToken"]["jwtToken"] },
-      });
-      console.log(response);
-      setGroups(
-        response.data.groups.map((group) => ({ ...group, id: group.groupId }))
-      );
+      setTotalHits(response.data.total);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -116,115 +62,110 @@ const Groups = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     getGroups();
-  }, []);
+  }, [paginationModel]);
 
   const columns = [
-    { field: "groupId", headerName: "Group #", type: "number", width: 70 },
-    { field: "title", headerName: "Group Title", width: 300 },
-    { field: "description", headerName: "Description" },
-    { field: "building", headerName: "Building", width: 200 },
-    { field: "status", headerName: "Status", width: 200 },
+    { field: "title", headerName: "Group Title", sortable: false, width: 300 },
+    {
+      field: "description",
+      headerName: "Description",
+      sortable: false,
+      width: 200,
+    },
+    { field: "building", headerName: "Building", sortable: false, width: 80 },
+    {
+      field: "status",
+      headerName: "Status",
+      sortable: false,
+      width: 130,
+      renderCell: (cellValues) => <Chip label={cellValues.value} />,
+    },
     {
       field: "details",
       headerName: "Details",
       sortable: false,
-      renderCell: (cellValues) => {
-        return <Link to={`/groups/${cellValues.id}`}>Details</Link>;
-      },
+      width: 100,
+      renderCell: (cellValues) => (
+        <Button variant="text" component={Link} to={`/groups/${cellValues.id}`}>
+          Details
+        </Button>
+      ),
     },
   ];
 
-  return loading ? (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "100vh" }}
-    >
-      Loading...
-      <RefreshIcon />
-    </Grid>
-  ) : (
+  return (
     <Container>
-      <Grid container spacing={20}>
-        <Grid item xs={1} md={1} lg={1}>
-          <div>Filters</div>
-          <FormControl
-            sx={{
-              width: 120,
-              marginTop: "20px",
-            }}
-          >
-            <TextField
-              id="standard-search"
-              label="Search field"
-              type="search"
-              variant="standard"
-              onChange={(event) => setQueryString(event.target.value)}
-            />
-          </FormControl>
-          <FormControl
-            sx={{
-              width: 120,
-              marginTop: "20px",
-              marginBottom: "20px",
-            }}
-          >
-            <InputLabel>Building</InputLabel>
-            <Select value={building}>
-              {buildings.map((option) => (
-                <MenuItem
-                  key={Object.keys(option)[0]}
-                  value={Object.values(option)[0]}
-                  onClick={(event) =>
-                    filterByBuilding(
-                      Object.keys(option)[0],
-                      Object.values(option)[0]
-                    )
-                  }
-                >
-                  <ListItemText primary={Object.values(option)[0]} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl sx={{ width: 120, marginBottom: "20px" }}>
-            <InputLabel>Status</InputLabel>
-            <Select value={stat} label="Status" onChange={filterByStatus}>
-              {stats.map((option) => (
-                <MenuItem key={option} value={option}>
-                  <ListItemText primary={option} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button type="submit" variant="contained" onClick={filterGroups}>
-            Filter
-          </Button>
-        </Grid>
-        <Grid item xs={10} md={10} lg={10}>
-          {/* <div style={{ fontSize: "200%" }}>Reports</div> */}
-          <div style={{ height: 600, width: "100%" }}>
-            <DataGrid
-              initialState={{
-                columns: {
-                  columnVisibilityModel: {
-                    groupId: false,
-                    description: false,
-                    date: false,
-                    userId: false,
-                  },
-                },
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={4} md={3} lg={2}>
+          <Typography variant="h6" sx={{ marginTop: "10px" }}>
+            Filter By
+          </Typography>
+          <Stack spacing={2} sx={{ marginTop: "10px" }}>
+            <FormControl fullWidth>
+              <TextField
+                label="Search field"
+                type="search"
+                variant="standard"
+                onChange={(event) => setQueryString(event.target.value)}
+              />
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Building</InputLabel>
+              <Select
+                value={buildingFilter}
+                label="Building"
+                onChange={(event) => {
+                  setBuildingFilter(event.target.value);
+                }}
+              >
+                {Object.entries(BUILDINGS).map(([k, v]) => (
+                  <MenuItem key={k} value={k}>
+                    <ListItemText primary={v} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={statusFilter}
+                label="Status"
+                onChange={(event) => {
+                  setStatusFilter(event.target.value);
+                }}
+              >
+                {STATUSES.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <ListItemText primary={option} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={() => {
+                getGroups();
               }}
-              rows={groups}
-              columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-            />
-          </div>
+            >
+              Filter
+            </Button>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} sm={8} md={9} lg={10}>
+          <DataGrid
+            autoHeight
+            rows={groups}
+            columns={columns}
+            loading={loading}
+            rowCount={totalHits || 0}
+            pageSizeOptions={[10, 20, 30]}
+            paginationModel={paginationModel}
+            paginationMode="server"
+            onPaginationModelChange={setPaginationModel}
+          />
         </Grid>
       </Grid>
     </Container>

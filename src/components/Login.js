@@ -1,9 +1,16 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Container from "react-bootstrap/Container";
+import {
+  Alert,
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { AccountContext } from "./AccountContext";
 
 const Login = () => {
@@ -28,38 +35,46 @@ const Login = () => {
   };
 
   return (
-    <Container>
-      {error && (
-        <Alert variant="danger" onClose={() => setError("")} dismissible>
-          <p> {error} </p>
-        </Alert>
-      )}
-      <h1>Login</h1>
-      <Form onSubmit={onSubmit}>
-        <Form.Group className="mb-3" controlId="formEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            value={email}
-            onChange={(event) => setEmail(event.target.value.trim())}
-            type="email"
-            placeholder="Enter email"
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            value={password}
-            onChange={(event) => setPassword(event.target.value.trim())}
-            type="password"
-            placeholder="Password"
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Login
-        </Button>
-      </Form>
-    </Container>
+    <Grid
+      container
+      spacing={2}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      style={{ minHeight: "100vh" }}
+    >
+      <Grid item xs={3}>
+        <Paper elevation={3} style={{ padding: "40px 30px" }}>
+          <Box component="form" onSubmit={onSubmit}>
+            <Stack direction="column" spacing={3} width="400px">
+              <Typography variant="h4">Admin Log In</Typography>
+              {error && <Alert severity="error">{error}</Alert>}
+              <FormControl fullWidth>
+                <TextField
+                  variant="outlined"
+                  label="Email address"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value.trim())}
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <TextField
+                  variant="outlined"
+                  label="Password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value.trim())}
+                />
+              </FormControl>
+              <Button variant="contained" type="submit" size="large">
+                Login
+              </Button>
+            </Stack>
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };
 

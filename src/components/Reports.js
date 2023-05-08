@@ -19,47 +19,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-
-const BUILDINGS = {
-  ALT: "Altschul Hall",
-  AVH: "Avery Hall",
-  BAR: "Barnard Hall",
-  BUT: "Butler Library",
-  BWY: "Broadway Residence Hall",
-  DIA: "Diana Center",
-  DOD: "Dodge Building",
-  FLS: "Fairchild Life Sciences Building",
-  HAM: "Hamilton Hall",
-  IAB: "International Affairs Building",
-  JRN: "Journalism Building",
-  KNT: "Kent Hall",
-  KNX: "Knox Hall",
-  LEH: "Lehman Hall",
-  LER: "Alfred Lerner Hall",
-  LEW: "Lewisohn Hall",
-  MAT: "Mathematics Building",
-  MCY: "Macy Hall",
-  MIL: "Milbank Hall, Barnard",
-  MLC: "Milstein Center, Barnard",
-  MUD: "Seeley W. Mudd Building",
-  NWC: "Northwest Corner",
-  PHI: "Philosophy Hall",
-  PRN: "Prentis Hall",
-  PUP: "Pupin Laboratories",
-  SCEP: "Schapiro Center",
-  SCH: "Schermerhorn Hall",
-  SCHP: "Schapiro Residence Hall",
-  URI: "Uris Hall",
-  UTS: "Union Theological Seminary",
-};
-
-const STATUSES = ["SUBMITTED", "PROCESSING", "RESOLVED"];
+import { BUILDINGS, STATUSES } from "../constants";
 
 const Reports = () => {
   const { session } = useContext(AccountContext);
 
   const [totalHits, setTotalHits] = useState(undefined);
-  const [reports, setReports] = useState(null);
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [queryString, setQueryString] = useState("");
