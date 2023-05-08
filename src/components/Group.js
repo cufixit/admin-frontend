@@ -316,7 +316,7 @@ const Group = () => {
                       onChange={(event) => setStatus(event.target.value)}
                     >
                       <MenuItem value={"SUBMITTED"}>SUBMITTED</MenuItem>
-                      <MenuItem value={"REVIEWING"}>REVIEWING</MenuItem>
+                      <MenuItem value={"PROCESSING"}>PROCESSING</MenuItem>
                       <MenuItem value={"RESOLVED"}>RESOLVED</MenuItem>
                     </Select>
                     <Button
