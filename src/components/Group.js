@@ -44,6 +44,7 @@ const Group = () => {
   const [reports, setReports] = useState([]);
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingSuggested, setLoadingSuggested] = useState(true);
   const [suggested, setSuggested] = useState(null);
   const [added, setAdded] = useState([]);
   const [confirmedIds, setConfirmedIds] = useState([]);
@@ -232,6 +233,7 @@ const Group = () => {
 
   // Gets suggested reports
   const getSuggested = async () => {
+    setLoadingSuggested(true);
     try {
       const response = await apigClient.invokeApi(
         {},
@@ -246,7 +248,7 @@ const Group = () => {
           id: report.reportId,
         }))
       );
-      setLoading(false);
+      setLoadingSuggested(false);
     } catch (error) {
       console.log(error);
     }
@@ -447,7 +449,9 @@ const Group = () => {
             <Divider sx={{ marginBottom: "25px" }} />
             {
               <>
-                {suggested === null || suggested.length == 0 ? (
+                {loadingSuggested ? (
+                  <>Loading suggestions ...</>
+                ) : suggested === null || suggested.length == 0 ? (
                   <>No suggestions for similar reports.</>
                 ) : (
                   <List dense sx={{ marginTop: "10px" }}>
