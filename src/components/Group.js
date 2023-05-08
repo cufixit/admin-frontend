@@ -46,8 +46,8 @@ const Group = () => {
   const [loading, setLoading] = useState(true);
   const [suggested, setSuggested] = useState(null);
   const [added, setAdded] = useState([]);
-  const [confirmedReports, setConfirmedReports] = useState([]);
-  const [status, setStatus] = useState("CREATED");
+  const [confirmedIds, setConfirmedIds] = useState([]);
+  const [status, setStatus] = useState("SUBMITTED");
   const [editStatus, setEditStatus] = useState(false);
 
   const navigate = useNavigate();
@@ -87,14 +87,7 @@ const Group = () => {
         reports.find((elem) => elem.id === item.id) === undefined
       ) {
         setAdded([...added, item]);
-        setConfirmedReports([
-          ...confirmedReports,
-          {
-            reportId: item.id,
-            createdDate: item.createdDate,
-            title: item.title,
-          },
-        ]);
+        setConfirmedIds([...confirmedIds, item.id]);
       }
     } catch (error) {
       console.log(error);
@@ -106,9 +99,7 @@ const Group = () => {
     event.preventDefault();
     try {
       setAdded(added.filter((elem) => elem.id !== item.id));
-      setConfirmedReports(
-        confirmedReports.filter((elem) => elem.reportId !== item.id)
-      );
+      setConfirmedIds(confirmedIds.filter((elem) => elem !== item.id));
     } catch (error) {
       console.log(error);
     }
@@ -118,18 +109,18 @@ const Group = () => {
   const confirmAdd = async (event) => {
     event.preventDefault();
     try {
-      // const response = await apigClient.invokeApi(
-      //   {},
-      //   `/groups/${params.id}/reports`,
-      //   "POST",
-      //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
-      //   confirmedReports
-      // )
-      // console.log(response);
-      console.log(confirmedReports);
+      const response = await apigClient.invokeApi(
+        {},
+        `/groups/${params.id}/reports`,
+        "PUT",
+        { headers: { Authorization: session["idToken"]["jwtToken"] } },
+        {
+          reports: [...reports.map((report) => report.id), ...confirmedIds],
+        }
+      );
       setReports([...reports, ...added]);
       setAdded([]);
-      setConfirmedReports([]);
+      setConfirmedIds([]);
     } catch (error) {
       console.log(error);
     }
@@ -199,22 +190,18 @@ const Group = () => {
   // Deletes a report from the group
   const deleteReportFromGroup = async (event, item) => {
     event.preventDefault();
-    console.log(item);
     setReports(reports.filter((elem) => elem.id !== item.reportId));
+    const filteredReports = reports.filter((elem) => elem.id !== item.reportId);
     try {
       const response = await apigClient.invokeApi(
         {},
-        `/groups/${params.id}`,
+        `/groups/${params.id}/reports`,
         "PUT",
         {
           headers: { Authorization: session["idToken"]["jwtToken"] },
         },
         {
-          reports: reports.map((report) => ({
-            reportId: report.id,
-            createdDate: report.createdDate,
-            title: report.title,
-          })),
+          reports: [filteredReports.map((report) => report.id)],
         }
       );
       console.log(response);
@@ -328,9 +315,9 @@ const Group = () => {
                       label="Status"
                       onChange={(event) => setStatus(event.target.value)}
                     >
-                      <MenuItem value={"CREATED"}>CREATED</MenuItem>
-                      <MenuItem value={"IN PROGRESS"}>IN PROGRESS</MenuItem>
-                      <MenuItem value={"COMPLETED"}>COMPLETED</MenuItem>
+                      <MenuItem value={"SUBMITTED"}>SUBMITTED</MenuItem>
+                      <MenuItem value={"REVIEWING"}>REVIEWING</MenuItem>
+                      <MenuItem value={"RESOLVED"}>RESOLVED</MenuItem>
                     </Select>
                     <Button
                       type="submit"

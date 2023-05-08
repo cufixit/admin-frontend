@@ -95,7 +95,7 @@ const Reports = () => {
     { UTS: "Union Theological Seminary" },
   ];
 
-  const stats = ["CREATED", "IN PROGRESS", "COMPLETED"];
+  const stats = ["SUBMITTED", "REVIEWING", "RESOLVED"];
 
   const getReports = async () => {
     // const queryParams = {
