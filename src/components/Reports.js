@@ -28,7 +28,7 @@ const Reports = () => {
   const [building, setBuilding] = useState("");
   const [code, setCode] = useState("");
   const [stat, setStat] = useState("");
-  const [grouped, setGrouped] = useState(false);
+  const [ungrouped, setUngrouped] = useState(false);
 
   // const [rowCount, setRowCount] = useState(0);
   // const [paginationModel, setPaginationModel] = useState({
@@ -58,8 +58,8 @@ const Reports = () => {
     );
   };
 
-  const checkGrouped = (event) => {
-    setGrouped(event.target.checked);
+  const checkUngrouped = (event) => {
+    setUngrouped(event.target.checked);
   };
 
   const buildings = [
@@ -125,6 +125,7 @@ const Reports = () => {
       q: queryString,
       status: stat,
       building: code,
+      ungrouped: ungrouped,
       // from: paginationModel.page,
       // size: paginationModel.pageSize,
     };
@@ -243,8 +244,10 @@ const Reports = () => {
             }}
           >
             <FormControlLabel
-              control={<Checkbox checked={grouped} onChange={checkGrouped} />}
-              label="Grouped"
+              control={
+                <Checkbox checked={ungrouped} onChange={checkUngrouped} />
+              }
+              label="Ungrouped"
             />
           </FormControl>
           <Button type="submit" variant="contained" onClick={filterReports}>
