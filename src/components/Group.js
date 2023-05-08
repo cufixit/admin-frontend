@@ -1,6 +1,6 @@
 // import { Container, ListItemText, Stack } from "@mui/material";
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -86,6 +86,7 @@ const Group = () => {
         reports.find((elem) => elem.id === item.id) === undefined
       ) {
         setAdded([...added, item]);
+        setSuggested(suggested.filter((elem) => elem.id !== item.id));
         setConfirmedIds([...confirmedIds, item.id]);
       }
     } catch (error) {
@@ -441,13 +442,13 @@ const Group = () => {
         <Grid item xs={12} md={6} lg={5}>
           <Paper sx={{ padding: "20px 30px 30px" }}>
             <Typography variant="h5" marginBottom="10px">
-              Suggested Reports
+              Similar Reports
             </Typography>
             <Divider sx={{ marginBottom: "25px" }} />
             {
               <>
-                {suggested === null ? (
-                  <></>
+                {suggested === null || suggested.length == 0 ? (
+                  <>No suggestions for similar reports.</>
                 ) : (
                   <List dense sx={{ marginTop: "10px" }}>
                     {suggested.map((item, i) => (
@@ -518,6 +519,14 @@ const Group = () => {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             {`User ID: ${modalContent.userId}`}
           </Typography>
+          <Button
+            component={Link}
+            to={`/reports/${modalContent.reportId}`}
+            sx={{ marginTop: "20px" }}
+            variant="contained"
+          >
+            Full Report
+          </Button>
         </Box>
       </Modal>
     </Container>
