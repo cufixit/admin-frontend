@@ -18,13 +18,17 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
   Modal,
   Paper,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -42,7 +46,9 @@ const Group = () => {
   const [loading, setLoading] = useState(true);
   const [suggested, setSuggested] = useState(null);
   const [added, setAdded] = useState([]);
-  const [confirmedIds, setConfirmedIds] = useState([]);
+  const [confirmedReports, setConfirmedReports] = useState([]);
+  const [status, setStatus] = useState("CREATED");
+  const [editStatus, setEditStatus] = useState(false);
 
   const navigate = useNavigate();
 
@@ -81,7 +87,14 @@ const Group = () => {
         reports.find((elem) => elem.id === item.id) === undefined
       ) {
         setAdded([...added, item]);
-        setConfirmedIds([...confirmedIds, item.id]);
+        setConfirmedReports([
+          ...confirmedReports,
+          {
+            reportId: item.id,
+            createdDate: item.createdDate,
+            title: item.title,
+          },
+        ]);
       }
     } catch (error) {
       console.log(error);
@@ -93,7 +106,9 @@ const Group = () => {
     event.preventDefault();
     try {
       setAdded(added.filter((elem) => elem.id !== item.id));
-      setConfirmedIds(confirmedIds.filter((elem) => elem !== item.id));
+      setConfirmedReports(
+        confirmedReports.filter((elem) => elem.reportId !== item.id)
+      );
     } catch (error) {
       console.log(error);
     }
@@ -108,12 +123,13 @@ const Group = () => {
       //   `/groups/${params.id}/reports`,
       //   "POST",
       //   { headers: { Authorization: session["idToken"]["jwtToken"] } },
-      //   confirmedIds
+      //   confirmedReports
       // )
       // console.log(response);
+      console.log(confirmedReports);
       setReports([...reports, ...added]);
       setAdded([]);
-      setConfirmedIds([]);
+      setConfirmedReports([]);
     } catch (error) {
       console.log(error);
     }
@@ -180,6 +196,33 @@ const Group = () => {
     }
   };
 
+  // Deletes a report from the group
+  const deleteReportFromGroup = async (event, item) => {
+    event.preventDefault();
+    console.log(item);
+    setReports(reports.filter((elem) => elem.id !== item.reportId));
+    try {
+      const response = await apigClient.invokeApi(
+        {},
+        `/groups/${params.id}`,
+        "PUT",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        },
+        {
+          reports: reports.map((report) => ({
+            reportId: report.id,
+            createdDate: report.createdDate,
+            title: report.title,
+          })),
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Gets specific report
   const getReport = async (item) => {
     try {
@@ -222,6 +265,22 @@ const Group = () => {
     }
   };
 
+  const updateStatus = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await apigClient.invokeApi(
+        {},
+        "/groups",
+        "PATCH",
+        { headers: { Authorization: session["idToken"]["jwtToken"] } },
+        { status: status }
+      );
+      setEditStatus(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getGroup();
     getSuggested();
@@ -257,7 +316,44 @@ const Group = () => {
                 <Typography variant="body1">
                   Building: {group?.building}
                 </Typography>
-                <Typography variant="body1">Status: {group?.status}</Typography>
+                {editStatus ? (
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">
+                      Status
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={status}
+                      label="Status"
+                      onChange={(event) => setStatus(event.target.value)}
+                    >
+                      <MenuItem value={"CREATED"}>CREATED</MenuItem>
+                      <MenuItem value={"IN PROGRESS"}>IN PROGRESS</MenuItem>
+                      <MenuItem value={"COMPLETED"}>COMPLETED</MenuItem>
+                    </Select>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      onClick={updateStatus}
+                    >
+                      Update status
+                    </Button>
+                  </FormControl>
+                ) : (
+                  <>
+                    <Typography variant="body1">
+                      Status: {group?.status}
+                    </Typography>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      onClick={(event) => setEditStatus(true)}
+                    >
+                      Edit status
+                    </Button>
+                  </>
+                )}
                 <Button
                   type="submit"
                   variant="contained"
@@ -286,10 +382,16 @@ const Group = () => {
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={deleteReports}>
-                      Yes, I want to delete the reports as well.
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "red",
+                      }}
+                      onClick={deleteReports}
+                    >
+                      Yes, delete the reports.
                     </Button>
-                    <Button onClick={deleteGroup}>
+                    <Button variant="contained" onClick={deleteGroup}>
                       No, just delete the group.
                     </Button>
                   </DialogActions>
@@ -303,7 +405,9 @@ const Group = () => {
                       <IconButton onClick={(event) => handleOpen(event, item)}>
                         <InfoOutlinedIcon />
                       </IconButton>
-                      <IconButton>
+                      <IconButton
+                        onClick={(event) => deleteReportFromGroup(event, item)}
+                      >
                         <DeleteOutlineOutlinedIcon sx={{ color: "red" }} />
                       </IconButton>
                     </ListItem>
