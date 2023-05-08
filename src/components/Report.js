@@ -42,6 +42,23 @@ const Report = () => {
     }
   };
 
+  const deleteReport = async () => {
+    try {
+      const response = await apigClient.invokeApi(
+        {},
+        `/reports/${params.id}`,
+        "DELETE",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        }
+      );
+      console.log(response);
+      navigate("/reports");
+    } catch (error) {
+      console.log(error.response);
+    }
+  };
+
   useEffect(() => {
     getReport();
   }, []);
@@ -107,6 +124,19 @@ const Report = () => {
                 onClick={onSubmit}
               >
                 {report.groupId === null ? "Create Group" : "View Group"}
+              </Button>
+              <br />
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  marginTop: "30px",
+                  fontWeight: "800",
+                  backgroundColor: "red",
+                }}
+                onClick={deleteReport}
+              >
+                Delete
               </Button>
             </Paper>
           }

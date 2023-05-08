@@ -121,7 +121,7 @@ const Groups = () => {
 
   const columns = [
     { field: "groupId", headerName: "Group #", type: "number", width: 70 },
-    { field: "title", headerName: "Report Title", width: 300 },
+    { field: "title", headerName: "Group Title", width: 300 },
     { field: "description", headerName: "Description" },
     { field: "building", headerName: "Building", width: 200 },
     { field: "status", headerName: "Status", width: 200 },

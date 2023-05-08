@@ -24,11 +24,24 @@ const Reports = () => {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [queryString, setQueryString] = React.useState("");
-  const [building, setBuilding] = React.useState("");
-  const [code, setCode] = React.useState("");
-  const [stat, setStat] = React.useState("");
-  const [grouped, setGrouped] = React.useState(false);
+  const [queryString, setQueryString] = useState("");
+  const [building, setBuilding] = useState("");
+  const [code, setCode] = useState("");
+  const [stat, setStat] = useState("");
+  const [grouped, setGrouped] = useState(false);
+
+  // const [rowCount, setRowCount] = useState(0);
+  // const [paginationModel, setPaginationModel] = useState({
+  //   pageSize: 1,
+  //   page: 0,
+  // });
+  // const [rowCountState, setRowCountState] = useState(rowCount);
+
+  // useEffect(() => {
+  //   setRowCountState((prevRowCountState) =>
+  //     rowCount !== undefined ? rowCount : prevRowCountState
+  //   );
+  // }, [rowCount, setRowCountState]);
 
   const filterByBuilding = (k, v) => {
     setCode(k);
@@ -85,9 +98,14 @@ const Reports = () => {
   const stats = ["CREATED", "IN PROGRESS", "COMPLETED"];
 
   const getReports = async () => {
+    // const queryParams = {
+    //   from: paginationModel.page,
+    //   size: paginationModel.pageSize,
+    // };
     try {
       const response = await apigClient.invokeApi({}, "/reports", "GET", {
         headers: { Authorization: session["idToken"]["jwtToken"] },
+        // queryParams: queryParams,
       });
       setReports(
         response.data.reports.map((report) => ({
@@ -95,6 +113,7 @@ const Reports = () => {
           id: report.reportId,
         }))
       );
+      // setRowCount(response.data.reports.length);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -106,6 +125,8 @@ const Reports = () => {
       q: queryString,
       status: stat,
       building: code,
+      // from: paginationModel.page,
+      // size: paginationModel.pageSize,
     };
     try {
       const response = await apigClient.invokeApi({}, "/reports", "GET", {
@@ -119,6 +140,7 @@ const Reports = () => {
           id: report.reportId,
         }))
       );
+      // setRowCount(response.data.reports.length);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -245,8 +267,11 @@ const Reports = () => {
               }}
               rows={reports}
               columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
+              // rowCount={rowCountState}
+              // pageSizeOptions={[paginationModel.pageSize]}
+              // paginationModel={paginationModel}
+              // paginationMode="server"
+              // onPaginationModelChange={setPaginationModel}
             />
           </div>
         </Grid>

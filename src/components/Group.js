@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { AccountContext } from "./AccountContext";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CheckIcon from "@mui/icons-material/Check";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -12,6 +12,11 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Grid,
   IconButton,
@@ -23,6 +28,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const Group = () => {
   const params = useParams();
@@ -33,15 +39,23 @@ const Group = () => {
   //   const report = location.state.report;
   const [reports, setReports] = useState([]);
   const [group, setGroup] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [suggested, setSuggested] = useState(null);
   const [added, setAdded] = useState([]);
   const [confirmedIds, setConfirmedIds] = useState([]);
 
+  const navigate = useNavigate();
+
   // Modal for viewing a report
   const [modalContent, setModalContent] = useState({});
   const [open, setOpen] = useState(false);
+
+  // Dialog for deleting a group and/or reports
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const handleOpen = async (event, item) => {
     event.preventDefault();
+    console.log(item);
     getReport(item);
   };
   const handleClose = () => setOpen(false);
@@ -57,36 +71,6 @@ const Group = () => {
     boxShadow: 24,
     p: 5,
   };
-
-  let rows = [
-    {
-      reportID: 1,
-      title: "Clogged sink on 5th floor kitchen",
-      description:
-        "The sink is clogged and has been clogged since last Sunday.",
-      building: "Schapiro Residence Hall",
-      status: "Submitted",
-      date: "1/20/2023 2:58 PM EST",
-    },
-    {
-      reportID: 3,
-      title: "Broken radiator in 555",
-      description:
-        "Radiator keeps on making weird noises. It will keep turning on and off for 5 minutes straight every day.",
-      building: "Alfred Lerner Hall",
-      status: "In progress",
-      date: "2/20/2023 1:00 PM EST",
-    },
-    {
-      reportID: 6,
-      title: "Air conditioner not working in 627",
-      description: "AC doesn't work.",
-      building: "Northwest Corner",
-      status: "In progress",
-      date: "12/2/2022 11:31 AM EST",
-    },
-  ];
-  rows.map((row) => (row["id"] = row["reportID"]));
 
   // Adds a suggested report to the group
   const addSuggested = async (event, item) => {
@@ -154,7 +138,43 @@ const Group = () => {
           id: report.reportId,
         }))
       );
-      //   setReports(reports);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Deletes the group
+  const deleteGroup = async () => {
+    try {
+      const response = await apigClient.invokeApi(
+        {},
+        `/groups/${params.id}`,
+        "DELETE",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        }
+      );
+      console.log(response);
+      navigate("/groups");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Deletes the reports in the group
+  const deleteReports = async () => {
+    try {
+      const response = await apigClient.invokeApi(
+        {},
+        `/groups/${params.id}?cascade=true`,
+        "DELETE",
+        {
+          headers: { Authorization: session["idToken"]["jwtToken"] },
+        }
+      );
+      console.log(response);
+      navigate("/groups");
     } catch (error) {
       console.log(error);
     }
@@ -174,6 +194,7 @@ const Group = () => {
       console.log(response);
       setModalContent(response.data.report);
       setOpen(true);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -189,8 +210,13 @@ const Group = () => {
         { headers: { Authorization: session["idToken"]["jwtToken"] } }
       );
       console.log(response);
-      setSuggested(response.data.reports);
-      //   setSuggested(rows);
+      setSuggested(
+        response.data.reports.map((report) => ({
+          ...report,
+          id: report.reportId,
+        }))
+      );
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -201,7 +227,19 @@ const Group = () => {
     getSuggested();
   }, []);
 
-  return (
+  return loading ? (
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      style={{ minHeight: "100vh" }}
+    >
+      Loading...
+      <RefreshIcon />
+    </Grid>
+  ) : (
     <Container fixed sx={{ marginTop: "100px" }}>
       <Grid container spacing={5}>
         <Grid item xs={12} md={6} lg={7}>
@@ -220,6 +258,42 @@ const Group = () => {
                   Building: {group?.building}
                 </Typography>
                 <Typography variant="body1">Status: {group?.status}</Typography>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    marginTop: "30px",
+                    fontWeight: "800",
+                    backgroundColor: "red",
+                  }}
+                  onClick={(event) => setDialogOpen(true)}
+                >
+                  Delete
+                </Button>
+                <Dialog
+                  open={dialogOpen}
+                  onClose={(event) => setDialogOpen(false)}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                >
+                  <DialogTitle id="alert-dialog-title">
+                    {"Delete Group"}
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                      Would you like to delete all the reports in this group as
+                      well?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={deleteReports}>
+                      Yes, I want to delete the reports as well.
+                    </Button>
+                    <Button onClick={deleteGroup}>
+                      No, just delete the group.
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Stack>
               <Paper sx={{ marginTop: "20px" }}>
                 <List>
@@ -280,44 +354,48 @@ const Group = () => {
             <Divider sx={{ marginBottom: "25px" }} />
             {
               <>
-                <List dense sx={{ marginTop: "10px" }}>
-                  {rows.map((item, i) => (
-                    <ListItem key={i} disablePadding>
-                      <IconButton
-                        onClick={(event) => addSuggested(event, item)}
-                      >
-                        <ArrowBackIosIcon />
-                      </IconButton>
-                      <ListItemText
-                        primary={
-                          <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                          >
-                            <Typography
-                              fontWeight="500"
-                              sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                display: "-webkit-box",
-                                WebkitLineClamp: "2",
-                                WebkitBoxOrient: "vertical",
-                              }}
+                {suggested === null ? (
+                  <></>
+                ) : (
+                  <List dense sx={{ marginTop: "10px" }}>
+                    {suggested.map((item, i) => (
+                      <ListItem key={i} disablePadding>
+                        <IconButton
+                          onClick={(event) => addSuggested(event, item)}
+                        >
+                          <ArrowBackIosIcon />
+                        </IconButton>
+                        <ListItemText
+                          primary={
+                            <Stack
+                              direction="row"
+                              justifyContent="space-between"
+                              alignItems="center"
                             >
-                              {`${item.title}`}
-                            </Typography>
-                            <IconButton
-                              onClick={(event) => handleOpen(event, item)}
-                            >
-                              <InfoOutlinedIcon />
-                            </IconButton>
-                          </Stack>
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
+                              <Typography
+                                fontWeight="500"
+                                sx={{
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: "2",
+                                  WebkitBoxOrient: "vertical",
+                                }}
+                              >
+                                {`${item.title}`}
+                              </Typography>
+                              <IconButton
+                                onClick={(event) => handleOpen(event, item)}
+                              >
+                                <InfoOutlinedIcon />
+                              </IconButton>
+                            </Stack>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
               </>
             }
           </Paper>
