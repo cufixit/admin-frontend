@@ -47,7 +47,6 @@ const Group = () => {
   const [suggested, setSuggested] = useState(null);
   const [added, setAdded] = useState([]);
   const [confirmedIds, setConfirmedIds] = useState([]);
-  const [status, setStatus] = useState("SUBMITTED");
   const [editStatus, setEditStatus] = useState(false);
 
   const navigate = useNavigate();
@@ -257,10 +256,10 @@ const Group = () => {
     try {
       const response = await apigClient.invokeApi(
         {},
-        "/groups",
+        `/groups/${params.id}`,
         "PATCH",
         { headers: { Authorization: session["idToken"]["jwtToken"] } },
-        { status: status }
+        { status: group?.status }
       );
       setEditStatus(false);
     } catch (error) {
@@ -311,9 +310,11 @@ const Group = () => {
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={status}
+                      value={group?.status}
                       label="Status"
-                      onChange={(event) => setStatus(event.target.value)}
+                      onChange={(event) =>
+                        setGroup({ ...group, status: event.target.value })
+                      }
                     >
                       <MenuItem value={"SUBMITTED"}>SUBMITTED</MenuItem>
                       <MenuItem value={"PROCESSING"}>PROCESSING</MenuItem>
