@@ -33,6 +33,7 @@ import {
   Typography,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { BUILDINGS, STATUSES } from "../constants";
 
 const Group = () => {
   const params = useParams();
@@ -303,7 +304,7 @@ const Group = () => {
                   Description: {group?.description}
                 </Typography>
                 <Typography variant="body1">
-                  Building: {group?.building}
+                  Building: {BUILDINGS[group?.building]}
                 </Typography>
                 {editStatus ? (
                   <FormControl fullWidth>
@@ -392,7 +393,9 @@ const Group = () => {
                 <List>
                   {reports.map((item) => (
                     <ListItem key={item.id}>
-                      <ListItemText primary={`${item.title}`} />
+                      <ListItemText
+                        primary={`[${item.createdDate}] ${item.title}`}
+                      />
                       <IconButton onClick={(event) => handleOpen(event, item)}>
                         <InfoOutlinedIcon />
                       </IconButton>
@@ -417,7 +420,9 @@ const Group = () => {
               <List>
                 {added.map((item) => (
                   <ListItem key={item.id}>
-                    <ListItemText primary={`${item.title}`} />
+                    <ListItemText
+                      primary={`[${item.createdDate}] ${item.title}`}
+                    />
                     <IconButton onClick={(event) => handleOpen(event, item)}>
                       <InfoOutlinedIcon />
                     </IconButton>
@@ -479,7 +484,7 @@ const Group = () => {
                                   WebkitBoxOrient: "vertical",
                                 }}
                               >
-                                {`${item.title}`}
+                                {`[${item.createdDate}] ${item.title}`}
                               </Typography>
                               <IconButton
                                 onClick={(event) => handleOpen(event, item)}
@@ -512,16 +517,16 @@ const Group = () => {
             {`Description: ${modalContent.description}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {`Building: ${modalContent.building}`}
+            {`Building: ${BUILDINGS[modalContent.building]}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             {`Status: ${modalContent.status}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {`Date Submitted: ${modalContent.createdDate}`}
+            {`Date Reported: ${modalContent.createdDate}`}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {`User ID: ${modalContent.userId}`}
+            {`Reporter ID: ${modalContent.userId}`}
           </Typography>
           <Button
             component={Link}

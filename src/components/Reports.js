@@ -105,7 +105,7 @@ const Reports = () => {
 
   return (
     <Container>
-      <Grid container spacing={3}>
+      <Grid container spacing={4}>
         <Grid item xs={12} sm={4} md={3} lg={2}>
           <Typography variant="h6" sx={{ marginTop: "10px" }}>
             Filter By
